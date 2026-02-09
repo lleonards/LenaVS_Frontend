@@ -1,0 +1,83 @@
+.preview-panel {
+  background: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.preview-panel h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #FF8C5A;
+}
+
+.preview-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.lyrics-display {
+  padding: 20px;
+  max-width: 90%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.preview-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 15px;
+  padding: 15px;
+  background: #2a2a2a;
+  border-radius: 8px;
+}
+
+.control-btn {
+  background: #FF8C5A;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.time-display {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.audio-switch-btn {
+  background: #333;
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.preview-controls input[type="color"] {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

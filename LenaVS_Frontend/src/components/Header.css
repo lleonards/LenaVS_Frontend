@@ -1,0 +1,40 @@
+.header {
+  background: #1e1e1e;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #FF8C5A;
+}
+
+.header-logo img {
+  height: 40px;
+  width: auto;
+}
+
+.header-nav {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.header-btn {
+  background: #2a2a2a;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.header-btn:hover {
+  background: #FF8C5A;
+}
+
+.header-btn.logout {
+  background: transparent;
+  border: 1px solid #888;
+}

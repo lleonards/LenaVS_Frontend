@@ -1,0 +1,100 @@
+.export-panel {
+  background: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.export-panel h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #FF8C5A;
+}
+
+.export-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ccc;
+}
+
+.form-group input,
+.form-group select {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.audio-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.audio-type-selector button {
+  background: #2a2a2a;
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.audio-type-selector button.active {
+  border-color: #FF8C5A;
+  background: rgba(255, 140, 90, 0.1);
+}
+
+.audio-type-selector button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.export-btn {
+  background: #FF8C5A;
+  color: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.export-btn:hover:not(:disabled) {
+  background: #ff7a45;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 140, 90, 0.4);
+}
+
+.export-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

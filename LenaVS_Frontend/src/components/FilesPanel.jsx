@@ -10,6 +10,8 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
   const [showTextInput, setShowTextInput] = useState(false);
   const [lyricsText, setLyricsText] = useState('');
 
+  const BASE_URL = api.defaults.baseURL;
+
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -25,20 +27,19 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
     try {
       setLoading(true);
 
-      const response = await api.post(
-        '/api/video/upload',
-        formData
-        // NÃO definir Content-Type
-      );
+      const response = await api.post('/api/video/upload', formData);
 
-      onFilesUploaded({ [type]: response.data.files[type] });
+      const filePath = response.data.files[type];
+
+      // 🔥 TRANSFORMA EM URL PÚBLICA
+      const publicUrl = `${BASE_URL}/${filePath}`;
+
+      onFilesUploaded({ [type]: publicUrl });
+
       alert('Arquivo enviado com sucesso!');
     } catch (error) {
       console.error('Erro no upload:', error.response || error);
-      alert(
-        error.response?.data?.error ||
-        'Erro ao enviar arquivo'
-      );
+      alert(error.response?.data?.error || 'Erro ao enviar arquivo');
     } finally {
       setLoading(false);
     }
@@ -59,10 +60,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
     try {
       setLoading(true);
 
-      const response = await api.post(
-        '/api/lyrics/upload',
-        formData
-      );
+      const response = await api.post('/api/lyrics/upload', formData);
 
       const stanzasData = response.data.stanzas.map((text, idx) => ({
         id: idx,
@@ -85,10 +83,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       alert(response.data.message);
     } catch (error) {
       console.error('Erro ao processar letra:', error.response || error);
-      alert(
-        error.response?.data?.error ||
-        'Erro ao processar letra'
-      );
+      alert(error.response?.data?.error || 'Erro ao processar letra');
     } finally {
       setLoading(false);
     }
@@ -105,10 +100,9 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
     try {
       setLoading(true);
 
-      const response = await api.post(
-        '/api/lyrics/manual',
-        { text: lyricsText }
-      );
+      const response = await api.post('/api/lyrics/manual', {
+        text: lyricsText
+      });
 
       const stanzasData = response.data.stanzas.map((text, idx) => ({
         id: idx,
@@ -133,10 +127,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       alert(response.data.message);
     } catch (error) {
       console.error('Erro ao processar letra manual:', error.response || error);
-      alert(
-        error.response?.data?.error ||
-        'Erro ao processar letra'
-      );
+      alert(error.response?.data?.error || 'Erro ao processar letra');
     } finally {
       setLoading(false);
     }

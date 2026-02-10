@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -9,9 +9,25 @@ import ExportPanel from '../components/ExportPanel';
 import './Editor.css';
 
 const Editor = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
-  
+
+  // 🔒 Proteger rota: só usuário logado
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
+
+  // Enquanto verifica sessão
+  if (loading) {
+    return (
+      <div className="editor-container">
+        <p style={{ color: '#fff', padding: 40 }}>Carregando sessão...</p>
+      </div>
+    );
+  }
+
   // Estados principais
   const [stanzas, setStanzas] = useState([]);
   const [showLyricsEditor, setShowLyricsEditor] = useState(false);
@@ -21,11 +37,11 @@ const Editor = () => {
     video: null,
     imagem: null
   });
-  
+
   const [currentTime, setCurrentTime] = useState(0);
   const [audioType, setAudioType] = useState('original');
   const [backgroundColor, setBackgroundColor] = useState('#000000');
-  
+
   const videoRef = useRef(null);
 
   // Callback quando letras são processadas
@@ -42,10 +58,10 @@ const Editor = () => {
   return (
     <div className="editor-container">
       <Header />
-      
+
       <div className="editor-main">
         <div className="editor-left">
-          <FilesPanel 
+          <FilesPanel
             onLyricsProcessed={handleLyricsProcessed}
             onFilesUploaded={handleFilesUploaded}
           />
@@ -63,8 +79,8 @@ const Editor = () => {
             onAudioTypeChange={setAudioType}
             onBackgroundColorChange={setBackgroundColor}
           />
-          
-          <ExportPanel 
+
+          <ExportPanel
             stanzas={stanzas}
             mediaFiles={mediaFiles}
             audioType={audioType}
@@ -91,3 +107,4 @@ const Editor = () => {
 };
 
 export default Editor;
+

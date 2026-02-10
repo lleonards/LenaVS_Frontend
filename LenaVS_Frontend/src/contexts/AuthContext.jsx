@@ -1,26 +1,31 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 
-const AuthContext = createContext({});
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar sessão atual
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Buscar sessão inicial
+    const loadSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-    });
+    };
 
-    // Escutar mudanças de autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    loadSession();
+
+    // Escutar mudanças de auth (login, logout, refresh token)
+    const { data: { subscription } } =
+      supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-      }
-    );
+      });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -30,9 +35,7 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
       options: {
-        data: {
-          name: name
-        }
+        data: { name }
       }
     });
 
@@ -57,7 +60,10 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    session,
+    accessToken: session?.access_token ?? null,
     loading,
+    isAuthenticated: !!session,
     signUp,
     signIn,
     signOut

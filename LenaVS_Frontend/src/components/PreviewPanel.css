@@ -28,6 +28,7 @@
   word-wrap: break-word;
   white-space: pre-wrap;
   animation: fadeIn 0.3s ease-in;
+  text-align: center;
 }
 
 @keyframes fadeIn {
@@ -37,32 +38,91 @@
 
 .preview-controls {
   display: flex;
-  gap: 15px;
   align-items: center;
+  gap: 15px;
   margin-top: 15px;
   padding: 15px;
   background: #2a2a2a;
   border-radius: 8px;
 }
 
+/* BOTÃO PLAY */
 .control-btn {
   background: #FF8C5A;
   color: #fff;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
+.control-btn:hover {
+  transform: scale(1.05);
+}
+
+/* TEMPO */
 .time-display {
-  flex: 1;
+  min-width: 100px;
   text-align: center;
   font-size: 14px;
   color: #ccc;
 }
 
+/* 🔥 BARRA DE PROGRESSO */
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 5px;
+  background: #444;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Track */
+.progress-bar::-webkit-slider-runnable-track {
+  height: 6px;
+  background: #444;
+  border-radius: 5px;
+}
+
+.progress-bar::-moz-range-track {
+  height: 6px;
+  background: #444;
+  border-radius: 5px;
+}
+
+/* Thumb */
+.progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #FF8C5A;
+  border-radius: 50%;
+  margin-top: -4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.progress-bar::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #FF8C5A;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* BOTÃO ORIGINAL / PLAYBACK */
 .audio-switch-btn {
   background: #333;
   color: #fff;
@@ -72,8 +132,16 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
+.audio-switch-btn:hover {
+  background: #444;
+}
+
+/* COLOR PICKER */
 .preview-controls input[type="color"] {
   width: 40px;
   height: 40px;

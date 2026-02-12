@@ -10,8 +10,6 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
   const [showTextInput, setShowTextInput] = useState(false);
   const [lyricsText, setLyricsText] = useState('');
 
-  const BASE_URL = api.defaults.baseURL;
-
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -29,11 +27,10 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
       const response = await api.post('/api/video/upload', formData);
 
-      const filePath = response.data.files[type];
+      // 🔥 O BACKEND JÁ RETORNA A URL COMPLETA
+      const publicUrl = response.data.files[type];
 
-      // 🔥 TRANSFORMA EM URL PÚBLICA
-      const publicUrl = `${BASE_URL}/${filePath}`;
-
+      // NÃO adicionar BASE_URL aqui
       onFilesUploaded({ [type]: publicUrl });
 
       alert('Arquivo enviado com sucesso!');

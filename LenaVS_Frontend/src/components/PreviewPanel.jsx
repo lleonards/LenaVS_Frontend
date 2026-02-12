@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Play, Pause, Music } from 'lucide-react';
 import './PreviewPanel.css';
 
@@ -16,13 +16,28 @@ const PreviewPanel = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
 
-  // Define qual áudio usar
-  const audioSrc =
-    audioType === 'instrumental'
-      ? mediaFiles?.musicaInstrumental
-      : mediaFiles?.musicaOriginal;
+  // ✅ GARANTE QUE NÃO DUPLICA URL
+  const cleanUrl = (url) => {
+    if (!url) return null;
 
-  // Atualizar áudio ao trocar tipo
+    // Se já for URL completa, usa direto
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+
+    return url;
+  };
+
+  const audioSrc = useMemo(() => {
+    const src =
+      audioType === 'instrumental'
+        ? mediaFiles?.musicaInstrumental
+        : mediaFiles?.musicaOriginal;
+
+    return cleanUrl(src);
+  }, [audioType, mediaFiles]);
+
+  // Atualiza quando troca áudio
   useEffect(() => {
     if (audioRef.current && audioSrc) {
       audioRef.current.pause();
@@ -31,7 +46,6 @@ const PreviewPanel = ({
     }
   }, [audioSrc]);
 
-  // Play / Pause com tratamento de erro
   const togglePlay = async () => {
     if (!audioRef.current || !audioSrc) return;
 
@@ -48,20 +62,22 @@ const PreviewPanel = ({
     }
   };
 
-  // Estrofe atual
   const getCurrentStanza = () => {
     return stanzas.find(stanza => {
+      if (!stanza.startTime || !stanza.endTime) return false;
+
       const [sm, ss] = stanza.startTime.split(':').map(Number);
       const [em, es] = stanza.endTime.split(':').map(Number);
+
       const start = sm * 60 + ss;
       const end = em * 60 + es;
+
       return currentTime >= start && currentTime <= end;
     });
   };
 
   const currentStanza = getCurrentStanza();
 
-  // Formatador de tempo
   const formatTime = (sec) => {
     if (!sec || isNaN(sec)) return "00:00";
     const m = Math.floor(sec / 60).toString().padStart(2, '0');
@@ -96,9 +112,10 @@ const PreviewPanel = ({
         )}
       </div>
 
-      {/* PLAYER REAL CORRIGIDO */}
+      {/* PLAYER REAL */}
       <audio
         ref={audioRef}
+        src={audioSrc || undefined}
         crossOrigin="anonymous"
         onTimeUpdate={(e) => onTimeUpdate(e.target.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.target.duration)}
@@ -106,12 +123,7 @@ const PreviewPanel = ({
         onError={() => {
           console.error("Erro ao carregar áudio:", audioSrc);
         }}
-      >
-        {audioSrc && (
-          <source src={audioSrc} type="audio/mpeg" />
-        )}
-        Seu navegador não suporta áudio.
-      </audio>
+      />
 
       <div className="preview-controls">
         <button

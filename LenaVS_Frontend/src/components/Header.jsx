@@ -17,8 +17,14 @@ const Header = () => {
 
   return (
     <header className="header">
+      
+      {/* 🔥 LOGO LOCAL (PASTA PUBLIC) */}
       <div className="header-logo">
-        <img src="https://www.genspark.ai/api/files/s/KM6WhUHq" alt="LenaVS" />
+        <img 
+          src="/logo_oficial.png" 
+          alt="LenaVS Logo" 
+          className="logo-img"
+        />
       </div>
 
       <div className="header-nav">
@@ -26,10 +32,12 @@ const Header = () => {
           <HelpCircle size={20} />
           Ajuda
         </button>
+
         <button className="header-btn" onClick={() => setShowProjects(!showProjects)}>
           <FolderOpen size={20} />
           Projetos
         </button>
+
         <button className="header-btn logout" onClick={handleLogout}>
           <LogOut size={20} />
         </button>

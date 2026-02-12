@@ -3,14 +3,14 @@ import { Play, Pause, Music } from 'lucide-react';
 import './PreviewPanel.css';
 
 const PreviewPanel = ({
-  stanzas,
-  currentTime,
-  audioType,
-  backgroundColor,
-  mediaFiles,
-  onTimeUpdate,
-  onAudioTypeChange,
-  onBackgroundColorChange
+  stanzas = [],
+  currentTime = 0,
+  audioType = 'original',
+  backgroundColor = '#000000',
+  mediaFiles = {},
+  onTimeUpdate = () => {},
+  onAudioTypeChange = () => {},
+  onBackgroundColorChange = () => {}
 }) => {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,17 +31,21 @@ const PreviewPanel = ({
     }
   }, [audioSrc]);
 
-  // Play / Pause
-  const togglePlay = () => {
+  // Play / Pause com tratamento de erro
+  const togglePlay = async () => {
     if (!audioRef.current || !audioSrc) return;
 
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (err) {
+      console.error("Erro ao tentar tocar áudio:", err);
     }
-
-    setIsPlaying(!isPlaying);
   };
 
   // Estrofe atual
@@ -59,6 +63,7 @@ const PreviewPanel = ({
 
   // Formatador de tempo
   const formatTime = (sec) => {
+    if (!sec || isNaN(sec)) return "00:00";
     const m = Math.floor(sec / 60).toString().padStart(2, '0');
     const s = Math.floor(sec % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
@@ -91,17 +96,29 @@ const PreviewPanel = ({
         )}
       </div>
 
-      {/* PLAYER REAL */}
+      {/* PLAYER REAL CORRIGIDO */}
       <audio
         ref={audioRef}
-        src={audioSrc}
+        crossOrigin="anonymous"
         onTimeUpdate={(e) => onTimeUpdate(e.target.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.target.duration)}
         onEnded={() => setIsPlaying(false)}
-      />
+        onError={() => {
+          console.error("Erro ao carregar áudio:", audioSrc);
+        }}
+      >
+        {audioSrc && (
+          <source src={audioSrc} type="audio/mpeg" />
+        )}
+        Seu navegador não suporta áudio.
+      </audio>
 
       <div className="preview-controls">
-        <button className="control-btn" onClick={togglePlay} disabled={!audioSrc}>
+        <button
+          className="control-btn"
+          onClick={togglePlay}
+          disabled={!audioSrc}
+        >
           {isPlaying ? <Pause size={20} /> : <Play size={20} />}
         </button>
 
@@ -112,7 +129,9 @@ const PreviewPanel = ({
         <button
           className="audio-switch-btn"
           onClick={() =>
-            onAudioTypeChange(audioType === 'original' ? 'instrumental' : 'original')
+            onAudioTypeChange(
+              audioType === 'original' ? 'instrumental' : 'original'
+            )
           }
           disabled={
             audioType === 'original'
@@ -136,4 +155,3 @@ const PreviewPanel = ({
 };
 
 export default PreviewPanel;
-

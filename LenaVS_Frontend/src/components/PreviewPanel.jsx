@@ -16,15 +16,12 @@ const PreviewPanel = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
 
-  // ✅ GARANTE QUE NÃO DUPLICA URL
+  // ✅ NÃO DUPLICA URL
   const cleanUrl = (url) => {
     if (!url) return null;
-
-    // Se já for URL completa, usa direto
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-
     return url;
   };
 
@@ -37,7 +34,6 @@ const PreviewPanel = ({
     return cleanUrl(src);
   }, [audioType, mediaFiles]);
 
-  // Atualiza quando troca áudio
   useEffect(() => {
     if (audioRef.current && audioSrc) {
       audioRef.current.pause();
@@ -59,6 +55,15 @@ const PreviewPanel = ({
       }
     } catch (err) {
       console.error("Erro ao tentar tocar áudio:", err);
+    }
+  };
+
+  // 🔥 FUNÇÃO DA BARRA
+  const handleSeek = (e) => {
+    const newTime = Number(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+      onTimeUpdate(newTime);
     }
   };
 
@@ -112,7 +117,6 @@ const PreviewPanel = ({
         )}
       </div>
 
-      {/* PLAYER REAL */}
       <audio
         ref={audioRef}
         src={audioSrc || undefined}
@@ -126,6 +130,7 @@ const PreviewPanel = ({
       />
 
       <div className="preview-controls">
+
         <button
           className="control-btn"
           onClick={togglePlay}
@@ -137,6 +142,16 @@ const PreviewPanel = ({
         <span className="time-display">
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
+
+        {/* 🔥 BARRA DE PROGRESSO */}
+        <input
+          type="range"
+          min="0"
+          max={duration || 0}
+          value={currentTime}
+          onChange={handleSeek}
+          className="progress-bar"
+        />
 
         <button
           className="audio-switch-btn"

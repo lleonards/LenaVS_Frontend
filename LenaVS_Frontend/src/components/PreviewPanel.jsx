@@ -34,12 +34,26 @@ const PreviewPanel = ({
     return cleanUrl(src);
   }, [audioType, mediaFiles]);
 
+  // 🔥 CORREÇÃO: troca áudio mantendo tempo atual
   useEffect(() => {
-    if (audioRef.current && audioSrc) {
-      audioRef.current.pause();
-      audioRef.current.load();
-      setIsPlaying(false);
-    }
+    if (!audioRef.current || !audioSrc) return;
+
+    const audio = audioRef.current;
+    const previousTime = audio.currentTime;
+    const wasPlaying = !audio.paused;
+
+    audio.pause();
+    audio.src = audioSrc;
+    audio.load();
+
+    audio.onloadedmetadata = () => {
+      audio.currentTime = previousTime;
+
+      if (wasPlaying) {
+        audio.play().catch(() => {});
+      }
+    };
+
   }, [audioSrc]);
 
   const togglePlay = async () => {
@@ -58,7 +72,6 @@ const PreviewPanel = ({
     }
   };
 
-  // 🔥 FUNÇÃO DA BARRA
   const handleSeek = (e) => {
     const newTime = Number(e.target.value);
     if (audioRef.current) {
@@ -119,7 +132,6 @@ const PreviewPanel = ({
 
       <audio
         ref={audioRef}
-        src={audioSrc || undefined}
         crossOrigin="anonymous"
         onTimeUpdate={(e) => onTimeUpdate(e.target.currentTime)}
         onLoadedMetadata={(e) => setDuration(e.target.duration)}
@@ -143,7 +155,6 @@ const PreviewPanel = ({
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
 
-        {/* 🔥 BARRA DE PROGRESSO */}
         <input
           type="range"
           min="0"

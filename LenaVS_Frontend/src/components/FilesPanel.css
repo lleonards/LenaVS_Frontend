@@ -1,57 +1,127 @@
-.files-panel h2 {
-  font-size: 18px;
-  margin-bottom: 20px;
-  color: #FF8C5A;
+.files-panel {
+  background-color: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
 }
+
+.files-panel h2 {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ========================= */
+/* Upload Section */
+/* ========================= */
 
 .upload-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* ========================= */
+/* Botões de Upload */
+/* ========================= */
+
 .upload-btn {
-  background: #2a2a2a;
-  color: #fff;
-  padding: 12px;
+  background-color: #2b2b2b;
+  color: white;
+  padding: 12px 16px;
   border-radius: 8px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
+  transition: all 0.25s ease;
+  border: 1px solid #3a3a3a;
   font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .upload-btn:hover {
-  background: #FF8C5A;
+  background-color: #353535;
+  transform: translateY(-1px);
+}
+
+.upload-btn:active {
+  transform: scale(0.98);
 }
 
 .upload-btn input {
   display: none;
 }
 
+/* ========================= */
+/* Loading State */
+/* ========================= */
+
+.upload-btn.loading {
+  background-color: #555;
+  border-color: #666;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* ========================= */
+/* Success State */
+/* ========================= */
+
+.upload-btn.success {
+  background-color: #2ecc71;
+  border-color: #27ae60;
+  color: white;
+  box-shadow: 0 0 12px rgba(46, 204, 113, 0.4);
+  transform: scale(1.02);
+}
+
+/* ========================= */
+/* Text Input Section */
+/* ========================= */
+
 .text-input-section {
-  margin-top: 15px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .text-input-section textarea {
-  background: #2a2a2a;
-  border: 1px solid #444;
-  border-radius: 8px;
+  width: 100%;
   padding: 12px;
-  color: #fff;
+  border-radius: 8px;
+  border: 1px solid #3a3a3a;
+  background-color: #2b2b2b;
+  color: white;
   font-size: 14px;
   resize: vertical;
+  transition: border 0.2s ease;
 }
 
+.text-input-section textarea:focus {
+  outline: none;
+  border-color: #2ecc71;
+}
+
+/* Botão Processar Letra */
+
 .text-input-section button {
-  background: #FF8C5A;
-  color: #fff;
-  padding: 10px;
+  background-color: #2b2b2b;
+  color: white;
+  padding: 10px 14px;
   border-radius: 8px;
-  font-weight: 600;
+  border: 1px solid #3a3a3a;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-weight: 500;
+}
+
+.text-input-section button:hover {
+  background-color: #353535;
+}
+
+.text-input-section button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

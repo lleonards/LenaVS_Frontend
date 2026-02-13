@@ -40,8 +40,8 @@ const Login = () => {
       <div className="login-box">
         <div className="logo-container">
           <img 
-            src="https://www.genspark.ai/api/files/s/KM6WhUHq" 
-            alt="LenaVS" 
+            src="/logo.png"
+            alt="LenaVS"
             className="logo-image"
           />
         </div>

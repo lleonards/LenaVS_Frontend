@@ -55,7 +55,7 @@ const Register = () => {
       <div className="register-box">
         <div className="logo-container">
           <img 
-            src="/logo.png" 
+            src="public/logo.png" 
             alt="LenaVS" 
             className="logo-image"
           />

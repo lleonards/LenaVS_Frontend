@@ -40,7 +40,7 @@ const Login = () => {
       <div className="login-box">
         <div className="logo-container">
           <img 
-            src="/logo.png"
+            src="/logo_oficial.png"
             alt="LenaVS"
             className="logo-image"
           />

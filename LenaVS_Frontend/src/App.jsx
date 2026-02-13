@@ -7,12 +7,42 @@ import Editor from './pages/Editor';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
-    return <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#fff'}}>Carregando...</div>;
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        color: '#fff'
+      }}>
+        Carregando...
+      </div>
+    );
   }
-  
+
   return user ? children : <Navigate to="/login" />;
+};
+
+const RootRedirect = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        color: '#fff'
+      }}>
+        Carregando...
+      </div>
+    );
+  }
+
+  return user ? <Navigate to="/editor" /> : <Navigate to="/login" />;
 };
 
 function App() {
@@ -22,12 +52,17 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/editor" element={
-            <PrivateRoute>
-              <Editor />
-            </PrivateRoute>
-          } />
-          <Route path="/" element={<Navigate to="/editor" />} />
+
+          <Route
+            path="/editor"
+            element={
+              <PrivateRoute>
+                <Editor />
+              </PrivateRoute>
+            }
+          />
+
+          <Route path="/" element={<RootRedirect />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

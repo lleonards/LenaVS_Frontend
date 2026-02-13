@@ -55,7 +55,7 @@ const Register = () => {
       <div className="register-box">
         <div className="logo-container">
           <img 
-            src="https://www.genspark.ai/api/files/s/KM6WhUHq" 
+            src="/logo.png" 
             alt="LenaVS" 
             className="logo-image"
           />

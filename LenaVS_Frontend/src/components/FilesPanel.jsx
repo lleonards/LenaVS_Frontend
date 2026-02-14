@@ -6,9 +6,19 @@ import './FilesPanel.css';
 
 const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
   const { isAuthenticated, loading: authLoading } = useAuth();
+
   const [loading, setLoading] = useState(false);
   const [showTextInput, setShowTextInput] = useState(false);
   const [lyricsText, setLyricsText] = useState('');
+
+  // ✅ Estado para mostrar o ✓
+  const [uploaded, setUploaded] = useState({
+    musicaOriginal: false,
+    musicaInstrumental: false,
+    video: false,
+    letraArquivo: false,
+    letraManual: false
+  });
 
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
@@ -27,11 +37,15 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
       const response = await api.post('/api/video/upload', formData);
 
-      // 🔥 O BACKEND JÁ RETORNA A URL COMPLETA
       const publicUrl = response.data.files[type];
 
-      // NÃO adicionar BASE_URL aqui
       onFilesUploaded({ [type]: publicUrl });
+
+      // ✅ Marca como enviado com sucesso
+      setUploaded(prev => ({
+        ...prev,
+        [type]: true
+      }));
 
       alert('Arquivo enviado com sucesso!');
     } catch (error) {
@@ -77,6 +91,13 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       }));
 
       onLyricsProcessed(stanzasData);
+
+      // ✅ Marca como enviado
+      setUploaded(prev => ({
+        ...prev,
+        letraArquivo: true
+      }));
+
       alert(response.data.message);
     } catch (error) {
       console.error('Erro ao processar letra:', error.response || error);
@@ -119,8 +140,16 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       }));
 
       onLyricsProcessed(stanzasData);
+
       setShowTextInput(false);
       setLyricsText('');
+
+      // ✅ Marca como enviado
+      setUploaded(prev => ({
+        ...prev,
+        letraManual: true
+      }));
+
       alert(response.data.message);
     } catch (error) {
       console.error('Erro ao processar letra manual:', error.response || error);
@@ -135,9 +164,10 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       <h2>Arquivos</h2>
 
       <div className="upload-section">
+
         <label className="upload-btn">
           <Upload size={18} />
-          Música Original
+          Música Original {uploaded.musicaOriginal && '✓'}
           <input
             type="file"
             accept="audio/*"
@@ -148,7 +178,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
         <label className="upload-btn">
           <Upload size={18} />
-          Música Instrumental
+          Música Instrumental {uploaded.musicaInstrumental && '✓'}
           <input
             type="file"
             accept="audio/*"
@@ -159,7 +189,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
         <label className="upload-btn">
           <Upload size={18} />
-          Vídeo/Foto
+          Vídeo/Foto {uploaded.video && '✓'}
           <input
             type="file"
             accept="video/*,image/*"
@@ -170,7 +200,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
         <label className="upload-btn">
           <Upload size={18} />
-          Letra (arquivo)
+          Letra (arquivo) {uploaded.letraArquivo && '✓'}
           <input
             type="file"
             accept=".txt,.docx,.pdf"
@@ -185,8 +215,9 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           disabled={loading}
         >
           <Type size={18} />
-          Colar Letra
+          Colar Letra {uploaded.letraManual && '✓'}
         </button>
+
       </div>
 
       {showTextInput && (

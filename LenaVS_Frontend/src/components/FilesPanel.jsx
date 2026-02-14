@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, Type, Check } from 'lucide-react';
+import { Upload, Type } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import './FilesPanel.css';
@@ -9,13 +9,6 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
   const [loading, setLoading] = useState(false);
   const [showTextInput, setShowTextInput] = useState(false);
   const [lyricsText, setLyricsText] = useState('');
-  const [uploadStatus, setUploadStatus] = useState(null); 
-  // null | musicaOriginal | musicaInstrumental | video | letraArquivo | letraManual
-
-  const triggerSuccess = (type) => {
-    setUploadStatus(type);
-    setTimeout(() => setUploadStatus(null), 3000);
-  };
 
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
@@ -33,12 +26,14 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       setLoading(true);
 
       const response = await api.post('/api/video/upload', formData);
+
+      // 🔥 O BACKEND JÁ RETORNA A URL COMPLETA
       const publicUrl = response.data.files[type];
 
+      // NÃO adicionar BASE_URL aqui
       onFilesUploaded({ [type]: publicUrl });
 
-      triggerSuccess(type);
-
+      alert('Arquivo enviado com sucesso!');
     } catch (error) {
       console.error('Erro no upload:', error.response || error);
       alert(error.response?.data?.error || 'Erro ao enviar arquivo');
@@ -82,8 +77,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       }));
 
       onLyricsProcessed(stanzasData);
-      triggerSuccess('letraArquivo');
-
+      alert(response.data.message);
     } catch (error) {
       console.error('Erro ao processar letra:', error.response || error);
       alert(error.response?.data?.error || 'Erro ao processar letra');
@@ -127,8 +121,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       onLyricsProcessed(stanzasData);
       setShowTextInput(false);
       setLyricsText('');
-      triggerSuccess('letraManual');
-
+      alert(response.data.message);
     } catch (error) {
       console.error('Erro ao processar letra manual:', error.response || error);
       alert(error.response?.data?.error || 'Erro ao processar letra');
@@ -137,46 +130,14 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
     }
   };
 
-  const getButtonClass = (type) => {
-    if (uploadStatus === type) return 'upload-btn success';
-    if (loading) return 'upload-btn loading';
-    return 'upload-btn';
-  };
-
-  const getButtonContent = (label, type) => {
-    if (uploadStatus === type) {
-      return (
-        <>
-          <Check size={18} />
-          Upload concluído
-        </>
-      );
-    }
-
-    if (loading) {
-      return (
-        <>
-          <Upload size={18} />
-          Enviando...
-        </>
-      );
-    }
-
-    return (
-      <>
-        <Upload size={18} />
-        {label}
-      </>
-    );
-  };
-
   return (
     <div className="files-panel">
       <h2>Arquivos</h2>
 
       <div className="upload-section">
-        <label className={getButtonClass('musicaOriginal')}>
-          {getButtonContent('Música Original', 'musicaOriginal')}
+        <label className="upload-btn">
+          <Upload size={18} />
+          Música Original
           <input
             type="file"
             accept="audio/*"
@@ -185,8 +146,9 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           />
         </label>
 
-        <label className={getButtonClass('musicaInstrumental')}>
-          {getButtonContent('Música Instrumental', 'musicaInstrumental')}
+        <label className="upload-btn">
+          <Upload size={18} />
+          Música Instrumental
           <input
             type="file"
             accept="audio/*"
@@ -195,8 +157,9 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           />
         </label>
 
-        <label className={getButtonClass('video')}>
-          {getButtonContent('Vídeo/Foto', 'video')}
+        <label className="upload-btn">
+          <Upload size={18} />
+          Vídeo/Foto
           <input
             type="file"
             accept="video/*,image/*"
@@ -205,8 +168,9 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           />
         </label>
 
-        <label className={getButtonClass('letraArquivo')}>
-          {getButtonContent('Letra (arquivo)', 'letraArquivo')}
+        <label className="upload-btn">
+          <Upload size={18} />
+          Letra (arquivo)
           <input
             type="file"
             accept=".txt,.docx,.pdf"
@@ -216,7 +180,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
         </label>
 
         <button
-          className={getButtonClass('letraManual')}
+          className="upload-btn"
           onClick={() => setShowTextInput(!showTextInput)}
           disabled={loading}
         >
@@ -234,7 +198,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
             rows="8"
           />
           <button onClick={handleManualLyrics} disabled={loading}>
-            {uploadStatus === 'letraManual' ? '✓ Processado!' : 'Processar Letra'}
+            Processar Letra
           </button>
         </div>
       )}

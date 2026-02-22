@@ -1,0 +1,82 @@
+/* Container principal */
+.upgrade-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  padding: 20px;
+}
+
+/* Card do plano */
+.plan-card {
+  background: #1f1f1f;
+  padding: 40px 30px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  transition: transform 0.2s ease;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Títulos */
+.plan-card h1 {
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+.plan-card h2 {
+  margin-bottom: 15px;
+  font-size: 22px;
+  color: #4da6ff;
+}
+
+/* Lista de benefícios */
+.plan-card p {
+  margin: 8px 0;
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+/* Botões */
+.price-options {
+  margin-top: 25px;
+}
+
+.price-options button {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Botão BRL */
+.price-options button:first-child {
+  background-color: #00c853;
+  color: white;
+}
+
+.price-options button:first-child:hover {
+  background-color: #00b248;
+}
+
+/* Botão USD */
+.price-options button:last-child {
+  background-color: #2962ff;
+  color: white;
+}
+
+.price-options button:last-child:hover {
+  background-color: #1e4ed8;
+}

@@ -1,22 +1,27 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Editor from './pages/Editor';
+import Upgrade from './pages/Upgrade'; // 🔥 NOVA IMPORTAÇÃO
 
+// 🔒 Rota protegida
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        color: '#fff'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          color: '#fff',
+        }}
+      >
         Carregando...
       </div>
     );
@@ -25,18 +30,21 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" />;
 };
 
+// 🔁 Redirecionamento da raiz
 const RootRedirect = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        color: '#fff'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          color: '#fff',
+        }}
+      >
         Carregando...
       </div>
     );
@@ -50,9 +58,11 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Editor protegido */}
           <Route
             path="/editor"
             element={
@@ -62,6 +72,17 @@ function App() {
             }
           />
 
+          {/* 🔥 Upgrade protegido */}
+          <Route
+            path="/upgrade"
+            element={
+              <PrivateRoute>
+                <Upgrade />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Raiz */}
           <Route path="/" element={<RootRedirect />} />
         </Routes>
       </BrowserRouter>

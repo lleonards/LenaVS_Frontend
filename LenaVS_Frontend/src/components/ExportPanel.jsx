@@ -23,26 +23,46 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
     setLoading(true);
 
     try {
+      // 🔥 1️⃣ Verifica e consome crédito
+      await api.post('/api/user/consume-credit');
+
+      // 🔥 2️⃣ Se passou aqui, pode gerar vídeo
       const response = await api.post('/api/video/generate', {
         projectName,
         audioType: exportAudioType,
-        audioPath: exportAudioType === 'original' 
-          ? mediaFiles.musicaOriginal 
-          : mediaFiles.musicaInstrumental,
-        backgroundType: mediaFiles.video ? 'video' : (mediaFiles.imagem ? 'image' : 'color'),
+        audioPath:
+          exportAudioType === 'original'
+            ? mediaFiles.musicaOriginal
+            : mediaFiles.musicaInstrumental,
+        backgroundType: mediaFiles.video
+          ? 'video'
+          : mediaFiles.imagem
+          ? 'image'
+          : 'color',
         backgroundPath: mediaFiles.video || mediaFiles.imagem,
         backgroundColor,
-        stanzas
+        stanzas,
+        videoFormat
       });
 
-      // Fazer download do vídeo
       const videoUrl = response.data.videoUrl;
+
       window.open(videoUrl, '_blank');
 
       alert('Vídeo gerado com sucesso!');
+
     } catch (error) {
+
+      // 🔥 Se for erro 403 → sem crédito
+      if (error.response?.status === 403) {
+        alert('Você está sem créditos. Faça upgrade para continuar.');
+        window.location.href = '/upgrade';
+        return;
+      }
+
       console.error('Erro ao gerar vídeo:', error);
       alert('Erro ao gerar vídeo. Tente novamente.');
+
     } finally {
       setLoading(false);
     }
@@ -70,13 +90,16 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
               className={exportAudioType === 'original' ? 'active' : ''}
               onClick={() => setExportAudioType('original')}
               disabled={!mediaFiles.musicaOriginal}
+              type="button"
             >
               Música Original
             </button>
+
             <button
               className={exportAudioType === 'instrumental' ? 'active' : ''}
               onClick={() => setExportAudioType('instrumental')}
               disabled={!mediaFiles.musicaInstrumental}
+              type="button"
             >
               Playback
             </button>
@@ -85,7 +108,10 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
 
         <div className="form-group">
           <label>Formato do Vídeo</label>
-          <select value={videoFormat} onChange={(e) => setVideoFormat(e.target.value)}>
+          <select
+            value={videoFormat}
+            onChange={(e) => setVideoFormat(e.target.value)}
+          >
             <option value="mp4">MP4</option>
             <option value="avi">AVI</option>
             <option value="mov">MOV</option>
@@ -93,7 +119,7 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
           </select>
         </div>
 
-        <button 
+        <button
           className="export-btn"
           onClick={handleExport}
           disabled={loading}

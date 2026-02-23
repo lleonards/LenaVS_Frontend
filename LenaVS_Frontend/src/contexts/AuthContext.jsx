@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 NOVOS ESTADOS
+  // 🔥 ESTADOS DE ASSINATURA
   const [plan, setPlan] = useState(null);
   const [credits, setCredits] = useState(0);
 
@@ -57,13 +57,16 @@ export const AuthProvider = ({ children }) => {
 
   const fetchSubscription = async () => {
     try {
-      const res = await api.get('/payment/subscription');
+      // ✅ CORREÇÃO AQUI
+      const res = await api.get('/api/payment/subscription');
 
-      setPlan(res.data.subscription.plan);
-      setCredits(res.data.subscription.credits ?? 0);
+      setPlan(res.data.subscription?.plan ?? null);
+      setCredits(res.data.subscription?.credits ?? 0);
 
     } catch (error) {
       console.error('Erro ao buscar assinatura:', error);
+      setPlan(null);
+      setCredits(0);
     }
   };
 
@@ -91,7 +94,6 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
-
     return data;
   };
 

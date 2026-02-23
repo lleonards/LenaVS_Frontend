@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Download, Loader } from 'lucide-react';
 import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './ExportPanel.css';
 
 const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
@@ -8,6 +10,9 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
   const [exportAudioType, setExportAudioType] = useState('original');
   const [videoFormat, setVideoFormat] = useState('mp4');
   const [loading, setLoading] = useState(false);
+
+  const { credits, plan, refreshSubscription } = useAuth();
+  const navigate = useNavigate();
 
   const handleExport = async () => {
     if (!projectName.trim()) {
@@ -20,13 +25,22 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
       return;
     }
 
+    // 🔥 BLOQUEIO FRONTEND EXTRA (segurança UX)
+    if (plan === 'free' && credits <= 0) {
+      alert('Você está sem créditos. Faça upgrade para continuar.');
+      navigate('/upgrade');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // 🔥 1️⃣ Verifica e consome crédito
-      await api.post('/api/user/consume-credit');
+      // 🔥 1️⃣ Consumir crédito (somente FREE)
+      if (plan === 'free') {
+        await api.post('/api/user/consume-credit');
+      }
 
-      // 🔥 2️⃣ Se passou aqui, pode gerar vídeo
+      // 🔥 2️⃣ Gerar vídeo
       const response = await api.post('/api/video/generate', {
         projectName,
         audioType: exportAudioType,
@@ -47,16 +61,18 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
 
       const videoUrl = response.data.videoUrl;
 
+      // 🔥 Atualiza créditos no contexto
+      await refreshSubscription();
+
       window.open(videoUrl, '_blank');
 
       alert('Vídeo gerado com sucesso!');
 
     } catch (error) {
 
-      // 🔥 Se for erro 403 → sem crédito
       if (error.response?.status === 403) {
         alert('Você está sem créditos. Faça upgrade para continuar.');
-        window.location.href = '/upgrade';
+        navigate('/upgrade');
         return;
       }
 
@@ -73,6 +89,7 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
       <h2>Exportar Vídeo</h2>
 
       <div className="export-form">
+
         <div className="form-group">
           <label>Nome do Projeto</label>
           <input
@@ -87,19 +104,19 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
           <label>Tipo de Áudio</label>
           <div className="audio-type-selector">
             <button
+              type="button"
               className={exportAudioType === 'original' ? 'active' : ''}
               onClick={() => setExportAudioType('original')}
               disabled={!mediaFiles.musicaOriginal}
-              type="button"
             >
               Música Original
             </button>
 
             <button
+              type="button"
               className={exportAudioType === 'instrumental' ? 'active' : ''}
               onClick={() => setExportAudioType('instrumental')}
               disabled={!mediaFiles.musicaInstrumental}
-              type="button"
             >
               Playback
             </button>
@@ -132,10 +149,13 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
           ) : (
             <>
               <Download size={20} />
-              EXPORTAR VÍDEO
+              {plan === 'free'
+                ? `EXPORTAR VÍDEO (${credits} créditos)`
+                : 'EXPORTAR VÍDEO'}
             </>
           )}
         </button>
+
       </div>
     </div>
   );

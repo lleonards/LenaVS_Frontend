@@ -5,34 +5,48 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000';
 
 const api = axios.create({
   baseURL: API_URL,
-  // NÃO definir Content-Type aqui
+  withCredentials: false, // importante para evitar conflitos CORS
 });
 
-// Adiciona token JWT em todas as requisições
+/* =====================================================
+   🔐 INTERCEPTOR DE REQUEST (JWT AUTOMÁTICO)
+===================================================== */
+
 api.interceptors.request.use(
   async (config) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const { data } = await supabase.auth.getSession();
+      const session = data?.session;
 
-    if (session?.access_token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${session.access_token}`,
-      };
+      if (session?.access_token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${session.access_token}`,
+        };
+      }
+
+      return config;
+    } catch (error) {
+      console.error('Erro ao obter sessão:', error);
+      return config;
     }
-
-    return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Interceptor de resposta
+/* =====================================================
+   🔁 INTERCEPTOR DE RESPONSE
+===================================================== */
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
+      console.warn('Token inválido ou expirado. Fazendo logout...');
       await supabase.auth.signOut();
-      // não força redirect aqui em uploads
+      window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

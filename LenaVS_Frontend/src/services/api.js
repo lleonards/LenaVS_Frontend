@@ -1,7 +1,13 @@
 import axios from 'axios';
 import { supabase } from './supabase';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000';
+// 🔥 CORREÇÃO: Define a URL baseada no ambiente (Produção vs Local)
+// Se não houver uma variável VITE_API_URL configurada, ele decide inteligentemente.
+const API_URL = import.meta.env.VITE_API_URL || (
+  import.meta.env.MODE === 'production' 
+    ? 'https://lenavs-backend.onrender.com' 
+    : 'http://localhost:10000'
+);
 
 const api = axios.create({
   baseURL: API_URL,

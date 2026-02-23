@@ -8,65 +8,38 @@ import Editor from './pages/Editor';
 import Upgrade from './pages/Upgrade';
 
 /* =====================================================
-   🔒 ROTA PROTEGIDA
+   🎨 ESTILO DE CARREGAMENTO
 ===================================================== */
-
-const PrivateRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div style={centerStyle}>
-        Carregando...
-      </div>
-    );
-  }
-
-  return user ? children : <Navigate to="/login" replace />;
-};
+const LoadingScreen = () => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    backgroundColor: '#000', // Ajuste conforme a cor do seu site
+    color: '#fff',
+    fontFamily: 'sans-serif'
+  }}>
+    <p>Carregando LenaVS...</p>
+  </div>
+);
 
 /* =====================================================
-   🚫 ROTA PÚBLICA (BLOQUEIA SE JÁ ESTIVER LOGADO)
+   🔒 COMPONENTE DE PROTEÇÃO DE ROTAS
 ===================================================== */
-
-const PublicRoute = ({ children }) => {
+// Centralizamos a lógica aqui para evitar travamentos em múltiplos lugares
+const AuthGuard = ({ children, isPrivate = true }) => {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div style={centerStyle}>
-        Carregando...
-      </div>
-    );
+  if (loading) return <LoadingScreen />;
+
+  if (isPrivate) {
+    // Se for privada e não tiver usuário, vai para login
+    return user ? children : <Navigate to="/login" replace />;
+  } else {
+    // Se for pública (login/register) e já tiver usuário, vai para o editor
+    return user ? <Navigate to="/editor" replace /> : children;
   }
-
-  return user ? <Navigate to="/editor" replace /> : children;
-};
-
-/* =====================================================
-   🔁 REDIRECIONAMENTO DA RAIZ
-===================================================== */
-
-const RootRedirect = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div style={centerStyle}>
-        Carregando...
-      </div>
-    );
-  }
-
-  return user ? <Navigate to="/editor" replace /> : <Navigate to="/login" replace />;
-};
-
-const centerStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: '100vh',
-  color: '#fff',
 };
 
 function App() {
@@ -74,48 +47,48 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-
-          {/* 🔓 Públicas protegidas contra usuário logado */}
+          
+          {/* 🔓 Rotas Públicas (Login/Cadastro) */}
           <Route
             path="/login"
             element={
-              <PublicRoute>
+              <AuthGuard isPrivate={false}>
                 <Login />
-              </PublicRoute>
+              </AuthGuard>
             }
           />
 
           <Route
             path="/register"
             element={
-              <PublicRoute>
+              <AuthGuard isPrivate={false}>
                 <Register />
-              </PublicRoute>
+              </AuthGuard>
             }
           />
 
-          {/* 🔒 Editor */}
+          {/* 🔒 Rotas Privadas (Editor/Upgrade) */}
           <Route
             path="/editor"
             element={
-              <PrivateRoute>
+              <AuthGuard isPrivate={true}>
                 <Editor />
-              </PrivateRoute>
+              </AuthGuard>
             }
           />
 
-          {/* 🔒 Upgrade */}
           <Route
             path="/upgrade"
             element={
-              <PrivateRoute>
+              <AuthGuard isPrivate={true}>
                 <Upgrade />
-              </PrivateRoute>
+              </AuthGuard>
             }
           />
 
-          {/* Raiz */}
-          <Route path="/" element={<RootRedirect />} />
+          {/* 🏠 Raiz e Fallback */}
+          <Route path="/" element={<Navigate to="/editor" replace />} />
+          <Route path="*" element={<Navigate to="/editor" replace />} />
 
         </Routes>
       </BrowserRouter>

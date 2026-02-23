@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔥 ESTADOS DE ASSINATURA
   const [plan, setPlan] = useState(null);
   const [credits, setCredits] = useState(0);
 
@@ -19,36 +18,55 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      try {
+        const { data } = await supabase.auth.getSession();
+        const currentSession = data?.session ?? null;
 
-      setSession(session);
-      setUser(session?.user ?? null);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
 
-      if (session) {
-        await fetchSubscription();
+        if (currentSession) {
+          try {
+            await fetchSubscription();
+          } catch (err) {
+            console.error('Erro ao buscar assinatura:', err);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar sessão:', error);
+      } finally {
+        setLoading(false); // 🔥 SEMPRE FINALIZA
       }
-
-      setLoading(false);
     };
 
     loadSession();
 
-    const { data: { subscription } } =
-      supabase.auth.onAuthStateChange(async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    const { data: authListener } =
+      supabase.auth.onAuthStateChange(async (_event, newSession) => {
+        try {
+          setSession(newSession);
+          setUser(newSession?.user ?? null);
 
-        if (session) {
-          await fetchSubscription();
-        } else {
-          setPlan(null);
-          setCredits(0);
+          if (newSession) {
+            try {
+              await fetchSubscription();
+            } catch (err) {
+              console.error('Erro ao buscar assinatura:', err);
+            }
+          } else {
+            setPlan(null);
+            setCredits(0);
+          }
+        } catch (err) {
+          console.error('Erro no auth state change:', err);
+        } finally {
+          setLoading(false); // 🔥 GARANTE QUE NÃO TRAVE
         }
-
-        setLoading(false);
       });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
   /* =====================================================
@@ -57,16 +75,15 @@ export const AuthProvider = ({ children }) => {
 
   const fetchSubscription = async () => {
     try {
-      // ✅ CORREÇÃO AQUI
       const res = await api.get('/api/payment/subscription');
 
-      setPlan(res.data.subscription?.plan ?? null);
-      setCredits(res.data.subscription?.credits ?? 0);
-
+      setPlan(res.data?.subscription?.plan ?? null);
+      setCredits(res.data?.subscription?.credits ?? 0);
     } catch (error) {
       console.error('Erro ao buscar assinatura:', error);
       setPlan(null);
       setCredits(0);
+      throw error; // importante para o try/catch externo funcionar
     }
   };
 
@@ -78,9 +95,7 @@ export const AuthProvider = ({ children }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { name }
-      }
+      options: { data: { name } }
     });
 
     if (error) throw error;
@@ -115,11 +130,9 @@ export const AuthProvider = ({ children }) => {
     accessToken: session?.access_token ?? null,
     loading,
     isAuthenticated: !!session,
-
     plan,
     credits,
     refreshSubscription: fetchSubscription,
-
     signUp,
     signIn,
     signOut

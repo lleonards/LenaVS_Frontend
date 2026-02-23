@@ -13,9 +13,24 @@ export const AuthProvider = ({ children }) => {
   const [credits, setCredits] = useState(0);
 
   /* =====================================================
-     🔄 CARREGAR SESSÃO INICIAL
+      💳 BUSCAR STATUS + CRÉDITOS
   ===================================================== */
+  const fetchSubscription = async () => {
+    try {
+      const res = await api.get('/api/payment/subscription');
+      setPlan(res.data?.subscription?.plan ?? null);
+      setCredits(res.data?.subscription?.credits ?? 0);
+    } catch (error) {
+      console.error('Erro ao buscar assinatura (usuário pode ser novo):', error.message);
+      // Se falhar, definimos valores padrão para não travar o App
+      setPlan(null);
+      setCredits(0);
+    }
+  };
 
+  /* =====================================================
+      🔄 CARREGAR SESSÃO INICIAL
+  ===================================================== */
   useEffect(() => {
     const loadSession = async () => {
       try {
@@ -26,43 +41,36 @@ export const AuthProvider = ({ children }) => {
         setUser(currentSession?.user ?? null);
 
         if (currentSession) {
-          try {
-            await fetchSubscription();
-          } catch (err) {
-            console.error('Erro ao buscar assinatura:', err);
-          }
+          // Não usamos 'await' aqui para não travar o carregamento inicial do App
+          fetchSubscription();
         }
       } catch (error) {
         console.error('Erro ao carregar sessão:', error);
       } finally {
-        setLoading(false); // 🔥 SEMPRE FINALIZA
+        setLoading(false);
       }
     };
 
     loadSession();
 
-    const { data: authListener } =
-      supabase.auth.onAuthStateChange(async (_event, newSession) => {
-        try {
-          setSession(newSession);
-          setUser(newSession?.user ?? null);
+    // Listener de mudanças na autenticação
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log('Evento Auth:', event);
+      
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
 
-          if (newSession) {
-            try {
-              await fetchSubscription();
-            } catch (err) {
-              console.error('Erro ao buscar assinatura:', err);
-            }
-          } else {
-            setPlan(null);
-            setCredits(0);
-          }
-        } catch (err) {
-          console.error('Erro no auth state change:', err);
-        } finally {
-          setLoading(false); // 🔥 GARANTE QUE NÃO TRAVE
-        }
-      });
+      if (newSession) {
+        // Se o usuário logou ou acabou de cadastrar
+        await fetchSubscription();
+      } else {
+        setPlan(null);
+        setCredits(0);
+      }
+      
+      // 🔥 GARANTE QUE O LOADING PARE APÓS QUALQUER EVENTO (LOGIN/LOGOUT/CADASTRO)
+      setLoading(false);
+    });
 
     return () => {
       authListener?.subscription?.unsubscribe();
@@ -70,32 +78,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /* =====================================================
-     💳 BUSCAR STATUS + CRÉDITOS
+      🔐 AUTH FUNCTIONS
   ===================================================== */
-
-  const fetchSubscription = async () => {
-    try {
-      const res = await api.get('/api/payment/subscription');
-
-      setPlan(res.data?.subscription?.plan ?? null);
-      setCredits(res.data?.subscription?.credits ?? 0);
-    } catch (error) {
-      console.error('Erro ao buscar assinatura:', error);
-      setPlan(null);
-      setCredits(0);
-      throw error; // importante para o try/catch externo funcionar
-    }
-  };
-
-  /* =====================================================
-     🔐 AUTH FUNCTIONS
-  ===================================================== */
-
   const signUp = async (email, password, name) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } }
+      options: { 
+        data: { name },
+        // Garante que o redirecionamento pós-cadastro funcione bem
+        emailRedirectTo: window.location.origin 
+      }
     });
 
     if (error) throw error;
@@ -107,22 +100,22 @@ export const AuthProvider = ({ children }) => {
       email,
       password
     });
-
     if (error) throw error;
     return data;
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-
-    setPlan(null);
-    setCredits(0);
+    setLoading(true); // Opcional: mostra loading enquanto sai
+    try {
+      await supabase.auth.signOut();
+      setPlan(null);
+      setCredits(0);
+      setUser(null);
+      setSession(null);
+    } finally {
+      setLoading(false);
+    }
   };
-
-  /* =====================================================
-     📦 CONTEXT VALUE
-  ===================================================== */
 
   const value = {
     user,

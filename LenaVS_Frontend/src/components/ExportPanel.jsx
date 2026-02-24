@@ -11,7 +11,8 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
   const [videoFormat, setVideoFormat] = useState('mp4');
   const [loading, setLoading] = useState(false);
 
-  const { credits, plan, refreshSubscription } = useAuth();
+  // Alterado de 'refreshSubscription' para 'fetchSubscription' conforme seu AuthContext
+  const { credits, plan, fetchSubscription } = useAuth(); 
   const navigate = useNavigate();
 
   const handleExport = async () => {
@@ -25,7 +26,7 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
       return;
     }
 
-    // 🔥 BLOQUEIO FRONTEND EXTRA (segurança UX)
+    // BLOQUEIO FRONTEND
     if (plan === 'free' && credits <= 0) {
       alert('Você está sem créditos. Faça upgrade para continuar.');
       navigate('/upgrade');
@@ -35,13 +36,14 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
     setLoading(true);
 
     try {
-      // 🔥 1️⃣ Consumir crédito (somente FREE)
+      // 1️⃣ Consumir crédito (somente FREE)
+      // Ajustado: Removido o '/api' extra e adicionado o prefixo '/user' que está no server.js
       if (plan === 'free') {
-        await api.post('/api/user/consume-credit');
+        await api.post('/user/consume-credit');
       }
 
-      // 🔥 2️⃣ Gerar vídeo
-      const response = await api.post('/api/video/generate', {
+      // 2️⃣ Gerar vídeo
+      const response = await api.post('/video/generate', {
         projectName,
         audioType: exportAudioType,
         audioPath:
@@ -61,24 +63,22 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
 
       const videoUrl = response.data.videoUrl;
 
-      // 🔥 Atualiza créditos no contexto
-      await refreshSubscription();
+      // 3️⃣ Atualiza créditos no contexto global para refletir no Header imediatamente
+      if (fetchSubscription) {
+        await fetchSubscription();
+      }
 
       window.open(videoUrl, '_blank');
-
       alert('Vídeo gerado com sucesso!');
 
     } catch (error) {
-
       if (error.response?.status === 403) {
         alert('Você está sem créditos. Faça upgrade para continuar.');
         navigate('/upgrade');
         return;
       }
-
       console.error('Erro ao gerar vídeo:', error);
-      alert('Erro ao gerar vídeo. Tente novamente.');
-
+      alert('Erro ao gerar vídeo. Verifique seus arquivos e tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -89,7 +89,6 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
       <h2>Exportar Vídeo</h2>
 
       <div className="export-form">
-
         <div className="form-group">
           <label>Nome do Projeto</label>
           <input
@@ -151,11 +150,10 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
               <Download size={20} />
               {plan === 'free'
                 ? `EXPORTAR VÍDEO (${credits} créditos)`
-                : 'EXPORTAR VÍDEO'}
+                : 'EXPORTAR VÍDEO (PRO)'}
             </>
           )}
         </button>
-
       </div>
     </div>
   );

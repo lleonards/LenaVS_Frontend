@@ -14,15 +14,15 @@ const Header = () => {
   const [showProjects, setShowProjects] = useState(false);
 
   /* =====================================================
-     💳 ABRIR CHECKOUT STRIPE
+      ABRIR CHECKOUT STRIPE
   ===================================================== */
   const handleUpgrade = async () => {
     try {
       const res = await api.post('/payment/create-session', {
         currency: 'BRL'
       });
-      if (res.data?.sessionUrl) {
-        window.location.href = res.data.sessionUrl; [cite: 5]
+      if (res.data && res.data.sessionUrl) {
+        window.location.href = res.data.sessionUrl;
       }
     } catch (error) {
       console.error('Erro ao iniciar checkout:', error);
@@ -30,13 +30,13 @@ const Header = () => {
   };
 
   const handleLogout = async () => {
-    await signOut(); [cite: 33]
+    await signOut();
     navigate('/login');
   };
 
   return (
     <header className="header">
-      {/* 🔥 LOGO */}
+      {/* LOGO */}
       <div className="header-logo">
         <img
           src="/logo_oficial.png"
@@ -46,7 +46,7 @@ const Header = () => {
       </div>
 
       <div className="header-nav">
-        {/* 🎁 BOTÃO UPGRADE + CRÉDITOS (TEMA LENAVS) */}
+        {/* BOTÃO UPGRADE + CRÉDITOS (TEMA LENAVS) */}
         {plan === 'pro' ? (
           <div className="pro-badge-v2">
             <Gem size={14} />

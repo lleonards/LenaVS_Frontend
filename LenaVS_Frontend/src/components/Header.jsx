@@ -1,62 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { HelpCircle, FolderOpen, LogOut, ArrowUp } from 'lucide-react';
+import { HelpCircle, FolderOpen, LogOut, ArrowUp, Gem } from 'lucide-react';
 import api from '../services/api';
 import './Header.css';
 
 const Header = () => {
-  const { signOut } = useAuth();
+  // Puxamos plan e credits diretamente do contexto global 
+  const { signOut, plan, credits } = useAuth();
   const navigate = useNavigate();
 
   const [showHelp, setShowHelp] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
 
-  const [plan, setPlan] = useState(null);
-  const [credits, setCredits] = useState(null);
-
-  /* =====================================================
-     🔄 BUSCAR STATUS DA ASSINATURA
-  ===================================================== */
-
-  useEffect(() => {
-    fetchSubscription();
-  }, []);
-
-  const fetchSubscription = async () => {
-    try {
-      const res = await api.get('/payment/subscription');
-      setPlan(res.data.subscription.plan);
-      setCredits(res.data.subscription.credits);
-    } catch (error) {
-      console.error('Erro ao buscar assinatura:', error);
-    }
-  };
-
   /* =====================================================
      💳 ABRIR CHECKOUT STRIPE
   ===================================================== */
-
   const handleUpgrade = async () => {
     try {
       const res = await api.post('/payment/create-session', {
         currency: 'BRL'
       });
-
-      window.location.href = res.data.sessionUrl;
+      if (res.data?.sessionUrl) {
+        window.location.href = res.data.sessionUrl; [cite: 5]
+      }
     } catch (error) {
       console.error('Erro ao iniciar checkout:', error);
     }
   };
 
   const handleLogout = async () => {
-    await signOut();
+    await signOut(); [cite: 33]
     navigate('/login');
   };
 
   return (
     <header className="header">
-
       {/* 🔥 LOGO */}
       <div className="header-logo">
         <img
@@ -67,24 +46,27 @@ const Header = () => {
       </div>
 
       <div className="header-nav">
-
-        {/* 🎁 BOTÃO UPGRADE + CRÉDITOS */}
-        {plan === 'free' && (
-          <button className="upgrade-btn" onClick={handleUpgrade}>
-            <ArrowUp size={18} />
-            <span>Upgrade</span>
-            <span className="credits-badge">
-              ✨ {credits ?? 0}
-            </span>
+        {/* 🎁 BOTÃO UPGRADE + CRÉDITOS (TEMA LENAVS) */}
+        {plan === 'pro' ? (
+          <div className="pro-badge-v2">
+            <Gem size={14} />
+            <span className="pro-text">PRO</span>
+            <span className="pro-status">Ilimitado</span>
+          </div>
+        ) : (
+          <button className="upgrade-btn-lenavs" onClick={handleUpgrade}>
+            <div className="credits-section">
+              <span className="credits-val">{credits ?? 0}</span>
+              <span className="credits-label">Créditos</span>
+            </div>
+            <div className="upgrade-label">
+              <ArrowUp size={14} />
+              UPGRADE
+            </div>
           </button>
         )}
 
-        {plan === 'pro' && (
-          <div className="pro-badge">
-            💎 PRO
-          </div>
-        )}
-
+        {/* BOTÕES DE NAVEGAÇÃO */}
         <button className="header-btn" onClick={() => setShowHelp(!showHelp)}>
           <HelpCircle size={20} />
           Ajuda
@@ -98,7 +80,6 @@ const Header = () => {
         <button className="header-btn logout" onClick={handleLogout}>
           <LogOut size={20} />
         </button>
-
       </div>
     </header>
   );

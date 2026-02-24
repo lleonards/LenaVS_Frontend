@@ -1,3 +1,7 @@
+/* ============================= */
+/* HEADER BASE */
+/* ============================= */
+
 .header {
   background: #1e1e1e;
   padding: 15px 30px;
@@ -14,27 +18,83 @@
 
 .header-nav {
   display: flex;
-  gap: 15px;
+  gap: 14px;
   align-items: center;
 }
+
+/* ============================= */
+/* BOTÕES PADRÃO */
+/* ============================= */
 
 .header-btn {
   background: #2a2a2a;
   color: #fff;
-  padding: 10px 20px;
+  padding: 8px 14px;
   border-radius: 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 14px;
   font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .header-btn:hover {
   background: #FF8C5A;
+  color: #000;
 }
 
 .header-btn.logout {
   background: transparent;
-  border: 1px solid #888;
+  border: 1px solid #555;
+}
+
+.header-btn.logout:hover {
+  background: #FF8C5A;
+  border-color: #FF8C5A;
+  color: #000;
+}
+
+/* ============================= */
+/* BOTÃO CRÉDITOS (FREE) */
+/* ============================= */
+
+.credits-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a1a1a;
+  border: 1px solid #FF8C5A;
+  color: #FF8C5A;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.credits-btn:hover {
+  background: #FF8C5A;
+  color: #000;
+}
+
+.credits-count {
+  font-weight: 700;
+}
+
+/* ============================= */
+/* BADGE PRO */
+/* ============================= */
+
+.pro-badge {
+  background: linear-gradient(135deg, #FF8C5A, #ffb089);
+  color: #000;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  letter-spacing: 0.5px;
 }

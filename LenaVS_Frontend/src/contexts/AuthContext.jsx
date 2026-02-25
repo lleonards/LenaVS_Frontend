@@ -51,17 +51,23 @@ export const AuthProvider = ({ children }) => {
 
           await fetchSubscription();
         }
+
       } catch (error) {
         console.error("Erro na inicialização auth:", error);
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          // Pequeno delay para evitar tela preta
+          setTimeout(() => {
+            setLoading(false);
+          }, 800);
+        }
       }
     };
 
     initAuth();
 
     // ======================================
-    // Auth State Listener
+    // Listener Auth
     // ======================================
     const {
       data: { subscription }
@@ -92,7 +98,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // ======================================
-  // Auth Actions
+  // Signup
   // ======================================
   const signUp = async (email, password, name) => {
     const { data, error } = await supabase.auth.signUp({
@@ -106,9 +112,17 @@ export const AuthProvider = ({ children }) => {
 
     if (error) throw error;
 
+    // Aguarda trigger backend criar usuário
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    await fetchSubscription();
+
     return data;
   };
 
+  // ======================================
+  // Login
+  // ======================================
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -120,6 +134,9 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  // ======================================
+  // Logout
+  // ======================================
   const signOut = async () => {
     await supabase.auth.signOut();
 
@@ -134,31 +151,33 @@ export const AuthProvider = ({ children }) => {
   // ======================================
   if (loading) {
     return (
-      <div
-        style={{
-          background: '#000',
-          height: '100vh',
-          width: '100vw'
-        }}
-      />
+      <div style={{
+        background: '#000',
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: '#fff'
+      }}>
+        Carregando...
+      </div>
     );
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        loading,
-        isAuthenticated: !!session,
-        plan,
-        credits,
-        fetchSubscription,
-        signUp,
-        signIn,
-        signOut
-      }}
-    >
+    <AuthContext.Provider value={{
+      user,
+      session,
+      loading,
+      isAuthenticated: !!session,
+      plan,
+      credits,
+      fetchSubscription,
+      signUp,
+      signIn,
+      signOut
+    }}>
       {children}
     </AuthContext.Provider>
   );

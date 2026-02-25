@@ -12,47 +12,42 @@ export const AuthProvider = ({ children }) => {
   const [plan, setPlan] = useState('free');
   const [credits, setCredits] = useState(0);
 
-  /* =====================================================
-      🔄 BUSCAR STATUS DO USUÁRIO (PLANO E CRÉDITOS)
-  ===================================================== */
+  // Função para buscar dados e validar o utilizador
   const fetchSubscription = async () => {
     try {
       const res = await api.get('/user/me');
-      
       if (res.data) {
         setPlan(res.data.plan ?? 'free');
         setCredits(res.data.credits_remaining ?? 0);
-        return true; // Sucesso na validação
+        return true;
       }
       return false;
     } catch (error) {
-      console.error("Erro ao validar usuário no backend:", error);
-      return false; // Usuário não existe ou token inválido
+      console.error("Erro ao validar no backend:", error);
+      return false;
     }
   };
 
-  /* =====================================================
-      🚀 INICIALIZAÇÃO RESILIENTE
-  ===================================================== */
   useEffect(() => {
     let mounted = true;
 
     const init = async () => {
       try {
+        // 1. Pega a sessão do Supabase
         const { data } = await supabase.auth.getSession();
         const currentSession = data?.session ?? null;
 
         if (!mounted) return;
 
         if (currentSession) {
-          // Se existe sessão no navegador, validamos com o BACKEND
+          // 2. Se existe sessão, tenta validar com o teu backend
           const isValid = await fetchSubscription();
           
           if (isValid) {
             setSession(currentSession);
             setUser(currentSession.user);
           } else {
-            // Se o usuário foi excluído do banco, limpamos a sessão local
+            // Se o utilizador não existe no banco, força logout
             await supabase.auth.signOut();
             setSession(null);
             setUser(null);
@@ -61,7 +56,7 @@ export const AuthProvider = ({ children }) => {
       } catch (err) {
         console.error("Erro crítico na inicialização:", err);
       } finally {
-        // O finally garante que o loading termine MESMO se der erro
+        // 3. OBRIGATÓRIO: Liberta a tela independentemente do resultado
         if (mounted) setLoading(false);
       }
     };
@@ -73,7 +68,7 @@ export const AuthProvider = ({ children }) => {
         if (newSession) {
           setSession(newSession);
           setUser(newSession.user);
-          await fetchSubscription();
+          fetchSubscription();
         } else {
           setSession(null);
           setUser(null);
@@ -89,27 +84,18 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  /* =====================================================
-      🔐 MÉTODOS DE AUTENTICAÇÃO
-  ===================================================== */
   const signUp = async (email, password, name) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { name },
-        emailRedirectTo: window.location.origin
-      }
+      options: { data: { name }, emailRedirectTo: window.location.origin }
     });
     if (error) throw error;
     return data;
   };
 
   const signIn = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     return data;
   };
@@ -121,6 +107,12 @@ export const AuthProvider = ({ children }) => {
     setPlan('free');
     setCredits(0);
   };
+
+  // Renderização de segurança: se estiver a carregar, mostra uma div preta ou vazia
+  // mas garante que após o loading o children apareça.
+  if (loading) {
+    return <div style={{ background: '#1e1e1e', height: '100vh', width: '100vw' }} />;
+  }
 
   return (
     <AuthContext.Provider
@@ -137,16 +129,13 @@ export const AuthProvider = ({ children }) => {
         signOut
       }}
     >
-      {/* Só renderiza o app quando terminar de checar tudo */}
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de AuthProvider');
-  }
+  if (!context) throw new Error('useAuth deve ser usado dentro de AuthProvider');
   return context;
 };

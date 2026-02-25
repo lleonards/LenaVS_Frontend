@@ -1,3 +1,5 @@
+import React from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 
 const AuthContext = createContext(null);
@@ -7,56 +9,42 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initialize = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session ?? null);
+    const getSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session ?? null);
       setLoading(false);
     };
 
-    initialize();
+    getSession();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange(
+    const { data } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
         setSession(newSession ?? null);
       }
     );
 
     return () => {
-      subscription?.subscription?.unsubscribe();
+      data?.subscription?.unsubscribe();
     };
   }, []);
-
-  // ======================
-  // AÇÕES
-  // ======================
 
   const signUp = async (email, password, name) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { name }
-      }
+      options: { data: { name } }
     });
 
     if (error) throw error;
 
-    // Login automático após cadastro
-    const { error: loginError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-    if (loginError) throw loginError;
+    await supabase.auth.signInWithPassword({ email, password });
   };
 
   const signIn = async (email, password) => {
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
     if (error) throw error;
   };
@@ -68,16 +56,14 @@ export const AuthProvider = ({ children }) => {
 
   if (loading) {
     return (
-      <div
-        style={{
-          background: '#000',
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          color: '#fff'
-        }}
-      >
+      <div style={{
+        background: '#000',
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: '#fff'
+      }}>
         Carregando...
       </div>
     );

@@ -9,36 +9,58 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
 
-    const initAuth = async () => {
+    // 🔎 Inicializa sessão ao abrir o site
+    const initializeAuth = async () => {
       try {
         const { data } = await supabase.auth.getSession();
 
-        if (!mounted) return;
+        if (!isMounted) return;
 
         if (data?.session) {
           setSession(data.session);
           setUser(data.session.user);
+        } else {
+          setSession(null);
+          setUser(null);
         }
 
       } catch (error) {
-        console.error("Auth init error:", error);
-      }
-
-      // 🔥 FORÇA encerrar loading independente do resultado
-      if (mounted) {
-        setLoading(false);
+        console.error("Erro ao inicializar auth:", error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    initAuth();
+    initializeAuth();
+
+    // 🔄 Listener para login / logout
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        if (!isMounted) return;
+
+        if (newSession) {
+          setSession(newSession);
+          setUser(newSession.user);
+        } else {
+          setSession(null);
+          setUser(null);
+        }
+      }
+    );
 
     return () => {
-      mounted = false;
+      isMounted = false;
+      listener?.subscription?.unsubscribe();
     };
-
   }, []);
+
+  // ================================
+  // Ações
+  // ================================
 
   const signUp = async (email, password, name) => {
     const { data, error } = await supabase.auth.signUp({
@@ -51,6 +73,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
+
     return data;
   };
 
@@ -61,6 +84,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
+
     return data;
   };
 
@@ -70,32 +94,40 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // ================================
+  // Loading Screen
+  // ================================
+
   if (loading) {
     return (
-      <div style={{
-        background: '#000',
-        height: '100vh',
-        width: '100vw',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        color: '#fff'
-      }}>
+      <div
+        style={{
+          background: '#000',
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#fff'
+        }}
+      >
         Carregando...
       </div>
     );
   }
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      isAuthenticated: !!session,
-      signUp,
-      signIn,
-      signOut
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        isAuthenticated: !!session,
+        signUp,
+        signIn,
+        signOut
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -103,6 +135,8 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth deve ser usado dentro de AuthProvider');
+  if (!context) {
+    throw new Error('useAuth deve ser usado dentro de AuthProvider');
+  }
   return context;
 };

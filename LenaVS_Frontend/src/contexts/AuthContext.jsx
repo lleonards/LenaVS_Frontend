@@ -5,12 +5,10 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
-  const [user, setUser] = useState(null); // aqui vai vir os dados do backend
+  const [user, setUser] = useState(null); 
   const [loading, setLoading] = useState(true);
 
-  // ================================
-  // 🔥 BUSCA DADOS REAIS DO BACKEND
-  // ================================
+  // 🔥 Busca dados reais do backend (/user/me)
   const fetchUserData = async (accessToken) => {
     try {
       const response = await fetch(
@@ -28,7 +26,6 @@ export const AuthProvider = ({ children }) => {
 
       const data = await response.json();
 
-      // 🔥 aqui salvamos dados reais (inclui credits_remaining)
       setUser(data);
 
     } catch (error) {
@@ -37,9 +34,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ================================
-  // 🔎 Inicialização
-  // ================================
+  // 🔎 Inicializa sessão ao abrir o site
   useEffect(() => {
     let isMounted = true;
 
@@ -68,7 +63,6 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
 
-    // 🔄 Listener login/logout
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
         if (!isMounted) return;
@@ -90,20 +84,30 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // ================================
-  // Ações
+  // 🔥 AÇÕES
   // ================================
 
+  // ✅ Cadastro + Login automático
   const signUp = async (email, password, name) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { name },
-        emailRedirectTo: window.location.origin
+        data: { name }
       }
     });
 
     if (error) throw error;
+
+    // 🔥 Login automático após cadastro
+    const { data, error: loginError } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+    if (loginError) throw loginError;
+
     return data;
   };
 
@@ -148,7 +152,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        user, // agora contém credits_remaining
+        user,
         session,
         loading,
         isAuthenticated: !!session,

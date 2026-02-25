@@ -4,30 +4,35 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 
 const CreditsBadge = () => {
-  const { session } = useAuth();
+  const { user } = useAuth(); // 👈 usar user direto
   const navigate = useNavigate();
 
-  const [credits, setCredits] = useState(null);
-  const [plan, setPlan] = useState(null);
+  const [credits, setCredits] = useState(0);
+  const [plan, setPlan] = useState('free');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCredits = async () => {
-      if (!session?.user?.id) return;
+      if (!user?.id) return;
 
       const { data, error } = await supabase
         .from('users')
         .select('credits, plan')
-        .eq('id', session.user.id)
+        .eq('id', user.id)
         .single();
 
       if (!error && data) {
         setCredits(data.credits);
         setPlan(data.plan);
       }
+
+      setLoading(false);
     };
 
     fetchCredits();
-  }, [session]);
+  }, [user]);
+
+  if (loading) return null;
 
   const isPro = plan === 'pro';
 
@@ -58,12 +63,10 @@ const CreditsBadge = () => {
       }}
     >
       {isPro ? (
-        <>
-          ⭐ Plano PRO
-        </>
+        <>⭐ Plano PRO</>
       ) : (
         <>
-          🔥 {credits ?? 0} créditos
+          🔥 {credits} créditos
           <span style={{ fontWeight: '700' }}> Upgrade</span>
         </>
       )}

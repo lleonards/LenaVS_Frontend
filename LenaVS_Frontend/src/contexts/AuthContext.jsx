@@ -12,28 +12,28 @@ export const AuthProvider = ({ children }) => {
   const [plan, setPlan] = useState('free');
   const [credits, setCredits] = useState(0);
 
-  // ======================================
-  // Backend validation
-  // ======================================
+  // ================================
+  // Backend subscription fetch
+  // ================================
   const fetchSubscription = async () => {
     try {
       const res = await api.get('/user/me');
 
-      if (!res?.data) return false;
-
-      setPlan(res.data.plan ?? 'free');
-      setCredits(res.data.credits_remaining ?? 0);
+      if (res?.data) {
+        setPlan(res.data.plan ?? 'free');
+        setCredits(res.data.credits_remaining ?? 0);
+      }
 
       return true;
     } catch (error) {
-      console.error("Erro ao validar assinatura:", error);
+      console.error("Subscription fetch error:", error);
       return false;
     }
   };
 
-  // ======================================
-  // Init Auth State
-  // ======================================
+  // ================================
+  // Init Auth
+  // ================================
   useEffect(() => {
     let mounted = true;
 
@@ -53,22 +53,22 @@ export const AuthProvider = ({ children }) => {
         }
 
       } catch (error) {
-        console.error("Erro na inicialização auth:", error);
-      } finally {
-        if (mounted) {
-          // Pequeno delay para evitar tela preta
-          setTimeout(() => {
-            setLoading(false);
-          }, 800);
-        }
+        console.error("Auth init error:", error);
+      }
+
+      // 🔥 GARANTE QUE LOADING SEMPRE TERMINA
+      if (mounted) {
+        setTimeout(() => {
+          setLoading(false);
+        }, 500);
       }
     };
 
     initAuth();
 
-    // ======================================
-    // Listener Auth
-    // ======================================
+    // ================================
+    // Listener Auth State
+    // ================================
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange(async (_, newSession) => {
@@ -86,20 +86,21 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Auth listener error:", error);
-      } finally {
-        if (mounted) setLoading(false);
       }
+
+      if (mounted) setLoading(false);
     });
 
     return () => {
       mounted = false;
       subscription?.unsubscribe();
     };
+
   }, []);
 
-  // ======================================
-  // Signup
-  // ======================================
+  // ================================
+  // Auth Actions
+  // ================================
   const signUp = async (email, password, name) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -112,17 +113,12 @@ export const AuthProvider = ({ children }) => {
 
     if (error) throw error;
 
-    // Aguarda trigger backend criar usuário
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
+    await new Promise(r => setTimeout(r, 2000));
     await fetchSubscription();
 
     return data;
   };
 
-  // ======================================
-  // Login
-  // ======================================
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -134,9 +130,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // ======================================
-  // Logout
-  // ======================================
   const signOut = async () => {
     await supabase.auth.signOut();
 
@@ -146,9 +139,9 @@ export const AuthProvider = ({ children }) => {
     setCredits(0);
   };
 
-  // ======================================
-  // Loading Screen
-  // ======================================
+  // ================================
+  // Loading UI
+  // ================================
   if (loading) {
     return (
       <div style={{
@@ -185,10 +178,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de AuthProvider');
-  }
-
+  if (!context) throw new Error('useAuth deve ser usado dentro de AuthProvider');
   return context;
 };

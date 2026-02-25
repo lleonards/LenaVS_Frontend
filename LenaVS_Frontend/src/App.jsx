@@ -16,7 +16,7 @@ const LoadingScreen = () => (
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
-    backgroundColor: '#000', // Ajuste conforme a cor do seu site
+    backgroundColor: '#000',
     color: '#fff',
     fontFamily: 'sans-serif'
   }}>
@@ -27,17 +27,14 @@ const LoadingScreen = () => (
 /* =====================================================
    🔒 COMPONENTE DE PROTEÇÃO DE ROTAS
 ===================================================== */
-// Centralizamos a lógica aqui para evitar travamentos em múltiplos lugares
 const AuthGuard = ({ children, isPrivate = true }) => {
   const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
 
   if (isPrivate) {
-    // Se for privada e não tiver usuário, vai para login
     return user ? children : <Navigate to="/login" replace />;
   } else {
-    // Se for pública (login/register) e já tiver usuário, vai para o editor
     return user ? <Navigate to="/editor" replace /> : children;
   }
 };
@@ -47,8 +44,8 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          
-          {/* 🔓 Rotas Públicas (Login/Cadastro) */}
+
+          {/* 🔓 Rotas Públicas */}
           <Route
             path="/login"
             element={
@@ -67,11 +64,11 @@ function App() {
             }
           />
 
-          {/* 🔒 Rotas Privadas (Editor/Upgrade) */}
+          {/* 🔒 Rotas Privadas */}
           <Route
             path="/editor"
             element={
-              <AuthGuard isPrivate={true}>
+              <AuthGuard>
                 <Editor />
               </AuthGuard>
             }
@@ -80,15 +77,27 @@ function App() {
           <Route
             path="/upgrade"
             element={
-              <AuthGuard isPrivate={true}>
+              <AuthGuard>
                 <Upgrade />
               </AuthGuard>
             }
           />
 
-          {/* 🏠 Raiz e Fallback */}
-          <Route path="/" element={<Navigate to="/editor" replace />} />
-          <Route path="*" element={<Navigate to="/editor" replace />} />
+          {/* 🏠 Raiz Inteligente */}
+          <Route
+            path="/"
+            element={
+              <AuthGuard>
+                <Editor />
+              </AuthGuard>
+            }
+          />
+
+          {/* 🔄 Fallback */}
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
 
         </Routes>
       </BrowserRouter>

@@ -7,50 +7,50 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Controla a tela de "Carregamento..."
 
-  const [plan, setPlan] = useState(null);
+  const [plan, setPlan] = useState('free');
   const [credits, setCredits] = useState(0);
 
-  /* =====================================================
-     🔄 BUSCAR STATUS DO USUÁRIO (PLANO E CRÉDITOS)
-  ===================================================== */
   const fetchSubscription = async () => {
     try {
-      // Chamada para a rota que você tem no backend que retorna plano e créditos
       const res = await api.get('/user/me'); 
-      
-      // O backend retorna: { plan: 'free', credits_remaining: 3, ... }
-      setPlan(res.data?.plan ?? 'free');
-      setCredits(res.data?.credits_remaining ?? 0);
+      if (res.data) {
+        setPlan(res.data.plan || 'free');
+        setCredits(res.data.credits_remaining || 0);
+      }
     } catch (error) {
       console.error("Erro ao buscar dados do usuário:", error);
+      // Mesmo com erro, definimos valores padrão para não travar o app
       setPlan('free');
       setCredits(0);
     }
   };
 
-  /* =====================================================
-     🚀 INICIALIZAÇÃO E MONITORAMENTO DE SESSÃO
-  ===================================================== */
   useEffect(() => {
     let mounted = true;
 
     const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentSession = data?.session ?? null;
+      try {
+        const { data } = await supabase.auth.getSession();
+        const currentSession = data?.session ?? null;
 
-      if (!mounted) return;
+        if (!mounted) return;
 
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
 
-      if (currentSession) {
-        // Busca os créditos e plano assim que logar
-        await fetchSubscription(); 
+        if (currentSession) {
+          // Tenta buscar a assinatura, mas não deixa o app travar se falhar
+          await fetchSubscription();
+        }
+      } catch (err) {
+        console.error("Erro na inicialização:", err);
+      } finally {
+        // 🔥 O segredo está aqui: o finally garante que o loading pare
+        // mesmo se der erro na rede ou na API.
+        if (mounted) setLoading(false);
       }
-      
-      setLoading(false);
     };
 
     init();
@@ -61,9 +61,9 @@ export const AuthProvider = ({ children }) => {
         setUser(newSession?.user ?? null);
 
         if (newSession) {
-          await fetchSubscription();
+          fetchSubscription();
         } else {
-          setPlan(null);
+          setPlan('free');
           setCredits(0);
         }
       }
@@ -75,37 +75,27 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  /* =====================================================
-     🔐 MÉTODOS DE AUTENTICAÇÃO
-  ===================================================== */
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setUser(null);
+    setPlan('free');
+    setCredits(0);
+  };
+
+  // Os outros métodos (signUp, signIn) continuam iguais...
   const signUp = async (email, password, name) => {
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name },
-        emailRedirectTo: window.location.origin
-      }
+      email, password, options: { data: { name }, emailRedirectTo: window.location.origin }
     });
     if (error) throw error;
     return data;
   };
 
   const signIn = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     return data;
-  };
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setUser(null);
-    setPlan(null);
-    setCredits(0);
   };
 
   return (
@@ -117,7 +107,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!session,
         plan,
         credits,
-        fetchSubscription, // Exportado para atualizar os créditos via ExportPanel
+        fetchSubscription,
         signUp,
         signIn,
         signOut
@@ -130,8 +120,6 @@ export const AuthProvider = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de AuthProvider');
-  }
+  if (!context) throw new Error('useAuth deve ser usado dentro de AuthProvider');
   return context;
 };

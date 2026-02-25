@@ -1,4 +1,3 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 
 const AuthContext = createContext(null);
@@ -8,28 +7,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-
     const initialize = async () => {
-      const { data } = await supabase.auth.getSession();
-
-      if (!mounted) return;
-
-      setSession(data.session ?? null);
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session ?? null);
       setLoading(false);
     };
 
     initialize();
 
-    const { data: listener } =
-      supabase.auth.onAuthStateChange((_event, newSession) => {
-        if (!mounted) return;
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
         setSession(newSession ?? null);
-      });
+      }
+    );
 
     return () => {
-      mounted = false;
-      listener?.subscription?.unsubscribe();
+      subscription?.subscription?.unsubscribe();
     };
   }, []);
 
@@ -48,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
     if (error) throw error;
 
-    // Login automático
+    // Login automático após cadastro
     const { error: loginError } =
       await supabase.auth.signInWithPassword({
         email,
@@ -94,7 +87,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         session,
-        user: session?.user ?? null, // 🔥 agora user vem direto do Supabase
+        user: session?.user ?? null,
         isAuthenticated: !!session,
         signUp,
         signIn,
@@ -106,6 +99,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

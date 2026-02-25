@@ -25,17 +25,23 @@ const LoadingScreen = () => (
 );
 
 /* =====================================================
-   🔒 COMPONENTE DE PROTEÇÃO DE ROTAS
+   🔒 COMPONENTE DE PROTEÇÃO DE ROTAS (CORRIGIDO)
 ===================================================== */
 const AuthGuard = ({ children, isPrivate = true }) => {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
 
   if (isPrivate) {
-    return user ? children : <Navigate to="/login" replace />;
+    // 🔒 Rota privada → precisa estar autenticado
+    return isAuthenticated
+      ? children
+      : <Navigate to="/login" replace />;
   } else {
-    return user ? <Navigate to="/editor" replace /> : children;
+    // 🔓 Rota pública (login/register)
+    return isAuthenticated
+      ? <Navigate to="/editor" replace />
+      : children;
   }
 };
 

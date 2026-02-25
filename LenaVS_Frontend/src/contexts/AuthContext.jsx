@@ -19,15 +19,14 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.get('/user/me');
 
-      if (res.data) {
-        setPlan(res.data.plan ?? 'free');
-        setCredits(res.data.credits_remaining ?? 0);
-        return true;
-      }
+      if (!res?.data) return false;
 
-      return false;
+      setPlan(res.data.plan ?? 'free');
+      setCredits(res.data.credits_remaining ?? 0);
+
+      return true;
     } catch (error) {
-      console.error("Erro ao validar no backend:", error);
+      console.error("Erro ao validar assinatura:", error);
       return false;
     }
   };
@@ -38,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     let mounted = true;
 
-    const init = async () => {
+    const initAuth = async () => {
       try {
         const {
           data: { session }
@@ -47,25 +46,19 @@ export const AuthProvider = ({ children }) => {
         if (!mounted) return;
 
         if (session) {
-          const isValid = await fetchSubscription();
+          setSession(session);
+          setUser(session.user);
 
-          if (isValid) {
-            setSession(session);
-            setUser(session.user);
-          } else {
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-          }
+          await fetchSubscription();
         }
-      } catch (err) {
-        console.error("Erro crítico na inicialização auth:", err);
+      } catch (error) {
+        console.error("Erro na inicialização auth:", error);
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
-    init();
+    initAuth();
 
     // ======================================
     // Auth State Listener
@@ -73,18 +66,23 @@ export const AuthProvider = ({ children }) => {
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange(async (_, newSession) => {
-      if (newSession) {
-        setSession(newSession);
-        setUser(newSession.user);
-        fetchSubscription();
-      } else {
-        setSession(null);
-        setUser(null);
-        setPlan('free');
-        setCredits(0);
-      }
+      try {
+        if (newSession) {
+          setSession(newSession);
+          setUser(newSession.user);
 
-      if (mounted) setLoading(false);
+          await fetchSubscription();
+        } else {
+          setSession(null);
+          setUser(null);
+          setPlan("free");
+          setCredits(0);
+        }
+      } catch (error) {
+        console.error("Auth listener error:", error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     });
 
     return () => {
@@ -107,6 +105,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
+
     return data;
   };
 
@@ -117,6 +116,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
+
     return data;
   };
 
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ======================================
-  // Loading safety render
+  // Loading Screen
   // ======================================
   if (loading) {
     return (

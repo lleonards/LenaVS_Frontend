@@ -5,13 +5,44 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // aqui vai vir os dados do backend
   const [loading, setLoading] = useState(true);
 
+  // ================================
+  // 🔥 BUSCA DADOS REAIS DO BACKEND
+  // ================================
+  const fetchUserData = async (accessToken) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/user/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar usuário');
+      }
+
+      const data = await response.json();
+
+      // 🔥 aqui salvamos dados reais (inclui credits_remaining)
+      setUser(data);
+
+    } catch (error) {
+      console.error('Erro ao buscar dados do usuário:', error);
+      setUser(null);
+    }
+  };
+
+  // ================================
+  // 🔎 Inicialização
+  // ================================
   useEffect(() => {
     let isMounted = true;
 
-    // 🔎 Inicializa sessão ao abrir o site
     const initializeAuth = async () => {
       try {
         const { data } = await supabase.auth.getSession();
@@ -20,14 +51,14 @@ export const AuthProvider = ({ children }) => {
 
         if (data?.session) {
           setSession(data.session);
-          setUser(data.session.user);
+          await fetchUserData(data.session.access_token);
         } else {
           setSession(null);
           setUser(null);
         }
 
       } catch (error) {
-        console.error("Erro ao inicializar auth:", error);
+        console.error('Erro ao inicializar auth:', error);
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -37,14 +68,14 @@ export const AuthProvider = ({ children }) => {
 
     initializeAuth();
 
-    // 🔄 Listener para login / logout
+    // 🔄 Listener login/logout
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      async (_event, newSession) => {
         if (!isMounted) return;
 
         if (newSession) {
           setSession(newSession);
-          setUser(newSession.user);
+          await fetchUserData(newSession.access_token);
         } else {
           setSession(null);
           setUser(null);
@@ -73,7 +104,6 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
-
     return data;
   };
 
@@ -84,7 +114,6 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (error) throw error;
-
     return data;
   };
 
@@ -119,7 +148,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user, // agora contém credits_remaining
         session,
         loading,
         isAuthenticated: !!session,

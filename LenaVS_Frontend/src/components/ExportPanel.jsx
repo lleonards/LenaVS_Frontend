@@ -1,8 +1,10 @@
-import React, { useState } from "react"; import { Download, Loader } from "lucide-react"; import api from "../services/api"; import { useAuth } from "../contexts/AuthContext"; import { useNavigate } from "react-router-dom"; import "./ExportPanel.css";
+import React, { useState } from "react"; import { Download, Loader } from "lucide-react"; import api from "../services/api"; 
+import { useAuth } from "../contexts/AuthContext"; import { useNavigate } from "react-router-dom"; import "./ExportPanel.css";
 const ExportPanel = ({ stanzas, mediaFiles, backgroundColor }) => {
 const [projectName, setProjectName] = useState("Meu_Projeto"); const [exportAudioType, setExportAudioType] = useState("original"); const [videoFormat, setVideoFormat] = useState("mp4"); const [loading, setLoading] = useState(false);
 const { credits, plan, refreshCredits } = useAuth(); const navigate = useNavigate();
-/* ========================================= CHECKOUT AUTOMÁTICO ========================================= */ const openCheckout = async () => { try {
+/* ========================================= CHECKOUT AUTOMÁTICO ========================================= */
+const openCheckout = async () => { try {
 const userLang = navigator.language || "pt-BR";
   const currency = userLang.startsWith("en") ? "USD" : "BRL";
 
@@ -36,10 +38,7 @@ try {
 
   setLoading(true);
 
-  /* ==============================
-     BLOQUEIO FREE SEM CRÉDITO
-  ============================== */
-
+  /* BLOQUEIO FREE SEM CRÉDITO */
   if (plan === "free" && credits <= 0) {
 
     alert("Você está sem créditos. Upgrade necessário.");
@@ -49,18 +48,12 @@ try {
     return;
   }
 
-  /* ==============================
-     CONSUMIR CRÉDITO
-  ============================== */
-
+  /* CONSUMIR CRÉDITO */
   if (plan === "free") {
     await api.post("/user/consume-credit");
   }
 
-  /* ==============================
-     GERAR VIDEO
-  ============================== */
-
+  /* GERAR VIDEO */
   const response = await api.post("/video/generate", {
     projectName,
     audioType: exportAudioType,
@@ -104,8 +97,10 @@ try {
   setLoading(false);
 }
 };
-return (  Exportar Vídeo
-<div className="export-form">
+return ( 
+<h2>Exportar Vídeo</h2>
+
+  <div className="export-form">
 
     <div className="form-group">
       <label>Nome do Projeto</label>

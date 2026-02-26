@@ -1,171 +1,192 @@
-import React, { useState } from "react"; import { Download, Loader } from "lucide-react"; import api from "../services/api"; 
-import { useAuth } from "../contexts/AuthContext"; import { useNavigate } from "react-router-dom"; import "./ExportPanel.css";
+import React, { useState } from "react";
+import { Download, Loader } from "lucide-react";
+import api from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import "./ExportPanel.css";
+
 const ExportPanel = ({ stanzas, mediaFiles, backgroundColor }) => {
-const [projectName, setProjectName] = useState("Meu_Projeto"); const [exportAudioType, setExportAudioType] = useState("original"); const [videoFormat, setVideoFormat] = useState("mp4"); const [loading, setLoading] = useState(false);
-const { credits, plan, refreshCredits } = useAuth(); const navigate = useNavigate();
-/* ========================================= CHECKOUT AUTOMÁTICO ========================================= */
-const openCheckout = async () => { try {
-const userLang = navigator.language || "pt-BR";
-  const currency = userLang.startsWith("en") ? "USD" : "BRL";
+  const [projectName, setProjectName] = useState("Meu_Projeto");
+  const [exportAudioType, setExportAudioType] = useState("original");
+  const [videoFormat, setVideoFormat] = useState("mp4");
+  const [loading, setLoading] = useState(false);
 
-  const res = await api.post("/payment/create-session", {
-    currency
-  });
+  const { credits, plan, refreshCredits } = useAuth();
+  const navigate = useNavigate();
 
-  if (res.data?.sessionUrl) {
-    window.location.href = res.data.sessionUrl;
-  }
+  /* =========================================
+     CHECKOUT AUTOMÁTICO
+  ========================================= */
 
-} catch (error) {
-  console.error("Erro checkout:", error);
-  alert("Erro ao abrir checkout");
-}
-};
-const handleExport = async () => {
-if (loading) return;
+  const openCheckout = async () => {
+    try {
+      const userLang = navigator.language || "pt-BR";
+      const currency = userLang.startsWith("en") ? "USD" : "BRL";
 
-if (!projectName.trim()) {
-  alert("Digite o nome do projeto");
-  return;
-}
+      const res = await api.post("/payment/create-session", {
+        currency
+      });
 
-if (!mediaFiles.musicaOriginal && !mediaFiles.musicaInstrumental) {
-  alert("Faça upload do áudio");
-  return;
-}
+      if (res.data?.sessionUrl) {
+        window.location.href = res.data.sessionUrl;
+      }
 
-try {
+    } catch (error) {
+      console.error("Erro checkout:", error);
+      alert("Erro ao abrir checkout");
+    }
+  };
 
-  setLoading(true);
+  const handleExport = async () => {
+    if (loading) return;
 
-  /* BLOQUEIO FREE SEM CRÉDITO */
-  if (plan === "free" && credits <= 0) {
+    if (!projectName.trim()) {
+      alert("Digite o nome do projeto");
+      return;
+    }
 
-    alert("Você está sem créditos. Upgrade necessário.");
+    if (!mediaFiles.musicaOriginal && !mediaFiles.musicaInstrumental) {
+      alert("Faça upload do áudio");
+      return;
+    }
 
-    await openCheckout();
+    try {
+      setLoading(true);
 
-    return;
-  }
+      /* BLOQUEIO FREE SEM CRÉDITO */
+      if (plan === "free" && credits <= 0) {
+        alert("Você está sem créditos. Upgrade necessário.");
 
-  /* CONSUMIR CRÉDITO */
-  if (plan === "free") {
-    await api.post("/user/consume-credit");
-  }
+        await openCheckout();
+        return;
+      }
 
-  /* GERAR VIDEO */
-  const response = await api.post("/video/generate", {
-    projectName,
-    audioType: exportAudioType,
-    audioPath:
-      exportAudioType === "original"
-        ? mediaFiles.musicaOriginal
-        : mediaFiles.musicaInstrumental,
+      /* CONSUMIR CRÉDITO FREE */
+      if (plan === "free") {
+        await api.post("/user/consume-credit");
+      }
 
-    backgroundType: mediaFiles.video
-      ? "video"
-      : mediaFiles.imagem
-      ? "image"
-      : "color",
+      /* GERAR VIDEO */
+      const response = await api.post("/video/generate", {
+        projectName,
+        audioType: exportAudioType,
+        audioPath:
+          exportAudioType === "original"
+            ? mediaFiles.musicaOriginal
+            : mediaFiles.musicaInstrumental,
 
-    backgroundPath: mediaFiles.video || mediaFiles.imagem,
-    backgroundColor,
-    stanzas,
-    videoFormat
-  });
+        backgroundType: mediaFiles.video
+          ? "video"
+          : mediaFiles.imagem
+          ? "image"
+          : "color",
 
-  const videoUrl = response.data?.videoUrl;
+        backgroundPath: mediaFiles.video || mediaFiles.imagem,
+        backgroundColor,
+        stanzas,
+        videoFormat
+      });
 
-  if (refreshCredits) await refreshCredits();
+      const videoUrl = response.data?.videoUrl;
 
-  window.open(videoUrl, "_blank");
+      if (refreshCredits) await refreshCredits();
 
-  alert("Vídeo gerado com sucesso!");
+      window.open(videoUrl, "_blank");
 
-} catch (error) {
+      alert("Vídeo gerado com sucesso!");
 
-  if (error.response?.status === 403) {
-    alert("Sem créditos. Faça upgrade.");
-    await openCheckout();
-    return;
-  }
+    } catch (error) {
 
-  console.error(error);
-  alert("Erro ao gerar vídeo");
+      if (error.response?.status === 403) {
+        alert("Sem créditos. Faça upgrade.");
+        await openCheckout();
+        return;
+      }
 
-} finally {
-  setLoading(false);
-}
-};
-return ( 
-<h2>Exportar Vídeo</h2>
+      console.error(error);
+      alert("Erro ao gerar vídeo");
 
-  <div className="export-form">
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    <div className="form-group">
-      <label>Nome do Projeto</label>
-      <input
-        type="text"
-        value={projectName}
-        onChange={(e) => setProjectName(e.target.value)}
-      />
-    </div>
+  return (
+    <div className="export-panel">
 
-    <div className="form-group">
-      <label>Tipo de Áudio</label>
+      <h2>Exportar Vídeo</h2>
 
-      <div className="audio-type-selector">
+      <div className="export-form">
+
+        <div className="form-group">
+          <label>Nome do Projeto</label>
+          <input
+            type="text"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            placeholder="Digite o nome do projeto"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Tipo de Áudio</label>
+
+          <div className="audio-type-selector">
+            <button
+              type="button"
+              className={exportAudioType === "original" ? "active" : ""}
+              onClick={() => setExportAudioType("original")}
+              disabled={!mediaFiles.musicaOriginal}
+            >
+              Música Original
+            </button>
+
+            <button
+              type="button"
+              className={exportAudioType === "instrumental" ? "active" : ""}
+              onClick={() => setExportAudioType("instrumental")}
+              disabled={!mediaFiles.musicaInstrumental}
+            >
+              Playback
+            </button>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Formato do Vídeo</label>
+
+          <select
+            value={videoFormat}
+            onChange={(e) => setVideoFormat(e.target.value)}
+          >
+            <option value="mp4">MP4</option>
+            <option value="avi">AVI</option>
+            <option value="mov">MOV</option>
+            <option value="mkv">MKV</option>
+          </select>
+        </div>
+
         <button
-          className={exportAudioType === "original" ? "active" : ""}
-          onClick={() => setExportAudioType("original")}
-          disabled={!mediaFiles.musicaOriginal}
+          className="export-btn"
+          onClick={handleExport}
+          disabled={loading}
         >
-          Música Original
+          {loading ? (
+            <>
+              <Loader size={20} className="spinner" />
+              Gerando vídeo...
+            </>
+          ) : (
+            <>
+              <Download size={20} />
+              EXPORTAR VÍDEO
+            </>
+          )}
         </button>
 
-        <button
-          className={exportAudioType === "instrumental" ? "active" : ""}
-          onClick={() => setExportAudioType("instrumental")}
-          disabled={!mediaFiles.musicaInstrumental}
-        >
-          Playback
-        </button>
       </div>
     </div>
+  );
+};
 
-    <div className="form-group">
-      <label>Formato do Vídeo</label>
-
-      <select
-        value={videoFormat}
-        onChange={(e) => setVideoFormat(e.target.value)}
-      >
-        <option value="mp4">MP4</option>
-        <option value="avi">AVI</option>
-        <option value="mov">MOV</option>
-        <option value="mkv">MKV</option>
-      </select>
-    </div>
-
-    <button
-      className="export-btn"
-      onClick={handleExport}
-      disabled={loading}
-    >
-      {loading ? (
-        <>
-          <Loader size={20} className="spinner" />
-          Gerando vídeo...
-        </>
-      ) : (
-        <>
-          <Download size={20} />
-          EXPORTAR VÍDEO
-        </>
-      )}
-    </button>
-
-  </div>
-</div>
-); };
 export default ExportPanel;

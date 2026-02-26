@@ -6,26 +6,37 @@ import api from '../services/api';
 import './Header.css';
 
 const Header = () => {
-  // Puxamos plan e credits diretamente do contexto global 
   const { signOut, plan, credits } = useAuth();
   const navigate = useNavigate();
 
   const [showHelp, setShowHelp] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
+  const [loadingUpgrade, setLoadingUpgrade] = useState(false);
 
   /* =====================================================
-      ABRIR CHECKOUT STRIPE
+      ABRIR CHECKOUT STRIPE COM MOEDA DINÂMICA
   ===================================================== */
   const handleUpgrade = async () => {
+    if (loadingUpgrade) return; // previne múltiplos cliques
+    setLoadingUpgrade(true);
+
     try {
-      const res = await api.post('/payment/create-session', {
-        currency: 'BRL'
-      });
+      // Detecta moeda pelo navegador (simples, pode melhorar depois)
+      const userLang = navigator.language || 'pt-BR';
+      const currency = userLang.startsWith('en') ? 'USD' : 'BRL';
+
+      const res = await api.post('/payment/create-session', { currency });
+
       if (res.data && res.data.sessionUrl) {
         window.location.href = res.data.sessionUrl;
+      } else {
+        alert('Não foi possível iniciar o checkout. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro ao iniciar checkout:', error);
+      alert('Erro ao iniciar o checkout. Tente novamente.');
+    } finally {
+      setLoadingUpgrade(false);
     }
   };
 
@@ -46,7 +57,7 @@ const Header = () => {
       </div>
 
       <div className="header-nav">
-        {/* BOTÃO UPGRADE + CRÉDITOS (TEMA LENAVS) */}
+        {/* BOTÃO DE UPGRADE / PRO */}
         {plan === 'pro' ? (
           <div className="pro-badge-v2">
             <Gem size={14} />
@@ -54,14 +65,18 @@ const Header = () => {
             <span className="pro-status">Ilimitado</span>
           </div>
         ) : (
-          <button className="upgrade-btn-lenavs" onClick={handleUpgrade}>
+          <button
+            className="upgrade-btn-lenavs"
+            onClick={handleUpgrade}
+            disabled={loadingUpgrade}
+          >
             <div className="credits-section">
               <span className="credits-val">{credits ?? 0}</span>
               <span className="credits-label">Créditos</span>
             </div>
             <div className="upgrade-label">
               <ArrowUp size={14} />
-              UPGRADE
+              {loadingUpgrade ? 'Redirecionando...' : 'UPGRADE'}
             </div>
           </button>
         )}
@@ -72,7 +87,10 @@ const Header = () => {
           Ajuda
         </button>
 
-        <button className="header-btn" onClick={() => setShowProjects(!showProjects)}>
+        <button
+          className="header-btn"
+          onClick={() => setShowProjects(!showProjects)}
+        >
           <FolderOpen size={20} />
           Projetos
         </button>

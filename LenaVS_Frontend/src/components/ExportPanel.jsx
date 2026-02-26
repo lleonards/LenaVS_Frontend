@@ -11,8 +11,7 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
   const [videoFormat, setVideoFormat] = useState('mp4');
   const [loading, setLoading] = useState(false);
 
-  // Alterado de 'refreshSubscription' para 'fetchSubscription' conforme seu AuthContext
-  const { credits, plan, fetchSubscription } = useAuth(); 
+  const { credits, plan, fetchSubscription } = useAuth();
   const navigate = useNavigate();
 
   const handleExport = async () => {
@@ -36,13 +35,12 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
     setLoading(true);
 
     try {
-      // 1️⃣ Consumir crédito (somente FREE)
-      // Ajustado: Removido o '/api' extra e adicionado o prefixo '/user' que está no server.js
+      // Consumir crédito (somente FREE)
       if (plan === 'free') {
         await api.post('/user/consume-credit');
       }
 
-      // 2️⃣ Gerar vídeo
+      // Gerar vídeo
       const response = await api.post('/video/generate', {
         projectName,
         audioType: exportAudioType,
@@ -63,7 +61,6 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
 
       const videoUrl = response.data.videoUrl;
 
-      // 3️⃣ Atualiza créditos no contexto global para refletir no Header imediatamente
       if (fetchSubscription) {
         await fetchSubscription();
       }
@@ -77,6 +74,7 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
         navigate('/upgrade');
         return;
       }
+
       console.error('Erro ao gerar vídeo:', error);
       alert('Erro ao gerar vídeo. Verifique seus arquivos e tente novamente.');
     } finally {
@@ -148,9 +146,7 @@ const ExportPanel = ({ stanzas, mediaFiles, audioType, backgroundColor }) => {
           ) : (
             <>
               <Download size={20} />
-              {plan === 'free'
-                ? `EXPORTAR VÍDEO (${credits} créditos)`
-                : 'EXPORTAR VÍDEO (PRO)'}
+              EXPORTAR VÍDEO
             </>
           )}
         </button>

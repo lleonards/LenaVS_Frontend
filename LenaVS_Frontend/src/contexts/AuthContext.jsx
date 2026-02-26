@@ -11,48 +11,66 @@ export const AuthProvider = ({ children }) => {
   const [plan, setPlan] = useState("free");
 
   // ===============================
-  // Buscar créditos no banco
+  // Buscar dados do usuário
   // ===============================
   const fetchUserData = async (userId) => {
     if (!userId) return;
 
-    const { data, error } = await supabase
-      .from("users")
-      .select("credits, plan")
-      .eq("id", userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("credits, plan")
+        .eq("id", userId)
+        .maybeSingle(); // 🔥 evita erro se não existir linha
 
-    if (error) {
-      console.error("Erro ao buscar usuário:", error.message);
-      return;
+      if (error) {
+        console.error("Erro ao buscar usuário:", error.message);
+        return;
+      }
+
+      setCredits(data?.credits ?? 0);
+      setPlan(data?.plan ?? "free");
+    } catch (err) {
+      console.error("Erro inesperado:", err);
     }
-
-    setCredits(data?.credits ?? 0);
-    setPlan(data?.plan ?? "free");
   };
 
   // ===============================
-  // Inicialização
+  // Inicialização AUTH
   // ===============================
   useEffect(() => {
-    const initializeAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentSession = data?.session ?? null;
+    let isMounted = true;
 
-      setSession(currentSession);
+    const initAuth = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
 
-      if (currentSession?.user) {
-        await fetchUserData(currentSession.user.id);
+        if (error) {
+          console.error("Erro getSession:", error.message);
+        }
+
+        if (!isMounted) return;
+
+        const currentSession = data?.session ?? null;
+        setSession(currentSession);
+
+        if (currentSession?.user) {
+          await fetchUserData(currentSession.user.id);
+        }
+      } catch (err) {
+        console.error("Erro initAuth:", err);
+      } finally {
+        if (isMounted) setLoading(false); // 🔥 GARANTIA ABSOLUTA
       }
-
-      setLoading(false);
     };
 
-    initializeAuth();
+    initAuth();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      if (!isMounted) return;
+
       setSession(newSession ?? null);
 
       if (newSession?.user) {
@@ -61,11 +79,10 @@ export const AuthProvider = ({ children }) => {
         setCredits(0);
         setPlan("free");
       }
-
-      setLoading(false);
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -106,7 +123,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ===============================
-  // Tela de Loading
+  // Loading Screen
   // ===============================
   if (loading) {
     return (

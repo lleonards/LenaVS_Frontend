@@ -23,28 +23,39 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      setSession(newSession ?? null);
+    // 🔥 1️⃣ RESTAURA SESSÃO AO CARREGAR O SITE
+    const getInitialSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      const currentSession = data.session;
 
-      if (newSession?.user) {
-        await fetchUserData(newSession.user.id);
-      } else {
-        setCredits(0);
-        setPlan("free");
+      setSession(currentSession ?? null);
+
+      if (currentSession?.user) {
+        await fetchUserData(currentSession.user.id);
       }
 
-      // 🔥 LOADING DESLIGA AQUI
       setLoading(false);
-    });
+    };
 
-    // 🔥 Força sair do loading se nada disparar
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
+    getInitialSession();
 
-    return () => subscription.unsubscribe();
+    // 🔥 2️⃣ ESCUTA LOGIN / LOGOUT
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (_event, newSession) => {
+        setSession(newSession ?? null);
+
+        if (newSession?.user) {
+          await fetchUserData(newSession.user.id);
+        } else {
+          setCredits(0);
+          setPlan("free");
+        }
+      }
+    );
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email, password, name) => {
@@ -68,29 +79,13 @@ export const AuthProvider = ({ children }) => {
     setPlan("free");
   };
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          background: "#000",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#fff",
-        }}
-      >
-        Carregando...
-      </div>
-    );
-  }
-
   return (
     <AuthContext.Provider
       value={{
         session,
         user: session?.user ?? null,
         isAuthenticated: !!session,
+        loading, // 🔥 AGORA ESTÁ SENDO EXPOSTO
         credits,
         plan,
         signUp,

@@ -10,42 +10,69 @@ export const AuthProvider = ({ children }) => {
   const [plan, setPlan] = useState("free");
 
   const fetchUserData = async (userId) => {
-    if (!userId) return;
+    try {
+      if (!userId) return;
 
-    const { data } = await supabase
-      .from("users")
-      .select("credits, plan")
-      .eq("id", userId)
-      .maybeSingle();
+      const { data, error } = await supabase
+        .from("users")
+        .select("credits, plan")
+        .eq("id", userId)
+        .maybeSingle();
 
-    setCredits(data?.credits ?? 0);
-    setPlan(data?.plan ?? "free");
+      if (error) {
+        console.warn("Erro ao buscar dados do usuário:", error.message);
+        setCredits(0);
+        setPlan("free");
+        return;
+      }
+
+      setCredits(data?.credits ?? 0);
+      setPlan(data?.plan ?? "free");
+    } catch (err) {
+      console.error("Erro inesperado fetchUserData:", err);
+      setCredits(0);
+      setPlan("free");
+    }
   };
 
   useEffect(() => {
-    // 🔥 1️⃣ RESTAURA SESSÃO AO CARREGAR O SITE
-    const getInitialSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentSession = data.session;
+    let isMounted = true;
 
-      setSession(currentSession ?? null);
+    const initializeAuth = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
 
-      if (currentSession?.user) {
-        await fetchUserData(currentSession.user.id);
+        if (error) {
+          console.error("Erro getSession:", error.message);
+        }
+
+        const currentSession = data?.session ?? null;
+
+        if (!isMounted) return;
+
+        setSession(currentSession);
+
+        if (currentSession?.user) {
+          // ⚠️ IMPORTANTE: NÃO bloquear loading esperando credits
+          fetchUserData(currentSession.user.id);
+        }
+      } catch (err) {
+        console.error("Erro inesperado initializeAuth:", err);
+      } finally {
+        if (isMounted) {
+          setLoading(false); // 🔥 GARANTIDO QUE DESLIGA
+        }
       }
-
-      setLoading(false);
     };
 
-    getInitialSession();
+    initializeAuth();
 
-    // 🔥 2️⃣ ESCUTA LOGIN / LOGOUT
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
         setSession(newSession ?? null);
 
         if (newSession?.user) {
-          await fetchUserData(newSession.user.id);
+          fetchUserData(newSession.user.id);
         } else {
           setCredits(0);
           setPlan("free");
@@ -54,22 +81,30 @@ export const AuthProvider = ({ children }) => {
     );
 
     return () => {
+      isMounted = false;
       listener.subscription.unsubscribe();
     };
   }, []);
 
   const signUp = async (email, password, name) => {
-    await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name } },
     });
 
+    if (error) throw error;
+
     await supabase.auth.signInWithPassword({ email, password });
   };
 
   const signIn = async (email, password) => {
-    await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) throw error;
   };
 
   const signOut = async () => {
@@ -85,7 +120,7 @@ export const AuthProvider = ({ children }) => {
         session,
         user: session?.user ?? null,
         isAuthenticated: !!session,
-        loading, // 🔥 AGORA ESTÁ SENDO EXPOSTO
+        loading,
         credits,
         plan,
         signUp,

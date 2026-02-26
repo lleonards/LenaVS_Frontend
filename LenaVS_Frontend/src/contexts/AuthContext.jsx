@@ -53,84 +53,15 @@ export const AuthProvider = ({ children }) => {
         setSession(currentSession);
 
         if (currentSession?.user) {
-          // ⚠️ IMPORTANTE: NÃO bloquear loading esperando credits
           fetchUserData(currentSession.user.id);
         }
       } catch (err) {
         console.error("Erro inesperado initializeAuth:", err);
       } finally {
         if (isMounted) {
-          setLoading(false); // 🔥 GARANTIDO QUE DESLIGA
+          setLoading(false); // 🔥 nunca trava
         }
       }
     };
 
-    initializeAuth();
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        setSession(newSession ?? null);
-
-        if (newSession?.user) {
-          fetchUserData(newSession.user.id);
-        } else {
-          setCredits(0);
-          setPlan("free");
-        }
-      }
-    );
-
-    return () => {
-      isMounted = false;
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  const signUp = async (email, password, name) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
-    });
-
-    if (error) throw error;
-
-    await supabase.auth.signInWithPassword({ email, password });
-  };
-
-  const signIn = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) throw error;
-  };
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setCredits(0);
-    setPlan("free");
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user: session?.user ?? null,
-        isAuthenticated: !!session,
-        loading,
-        credits,
-        plan,
-        signUp,
-        signIn,
-        signOut,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export const useAuth = () => useContext(AuthContext);
+    initializeAuth

@@ -3,16 +3,21 @@ import { supabase } from './supabase';
 
 /* =====================================================
    🌍 BASE URL
-   Sempre adiciona /api automaticamente
+   Garante que nunca duplique barras
 ===================================================== */
 
-const BASE =
+let BASE =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.MODE === 'production'
     ? 'https://lenavs-backend.onrender.com'
     : 'http://localhost:10000');
 
-// 🔥 GARANTE que /api sempre esteja presente
+// 🔥 Remove barra final se existir
+if (BASE.endsWith('/')) {
+  BASE = BASE.slice(0, -1);
+}
+
+// 🔥 Adiciona /api corretamente
 const API_URL = `${BASE}/api`;
 
 const api = axios.create({

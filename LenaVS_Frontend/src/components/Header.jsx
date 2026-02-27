@@ -21,23 +21,23 @@ const Header = () => {
     setLoadingUpgrade(true);
 
     try {
-      // Detecta idioma do navegador
       const userLang = navigator.language || 'pt-BR';
-
-      // ⚠ IMPORTANTE: enviar minúsculo
       const currency = userLang.startsWith('en') ? 'usd' : 'brl';
 
       const res = await api.post('/payment/create-session', { currency });
 
-      // ⚠ Alinhado com backend que retorna { url }
-      if (res.data && res.data.url) {
-        window.location.href = res.data.url;
+      // ✅ CORRIGIDO AQUI
+      if (res.data && res.data.sessionUrl) {
+        window.location.href = res.data.sessionUrl;
       } else {
         alert('Não foi possível iniciar o checkout. Tente novamente.');
       }
 
     } catch (error) {
-      console.error('Erro ao iniciar checkout:', error.response?.data || error.message);
+      console.error(
+        'Erro ao iniciar checkout:',
+        error.response?.data || error.message
+      );
       alert('Erro ao iniciar o checkout.');
     } finally {
       setLoadingUpgrade(false);
@@ -72,6 +72,7 @@ const Header = () => {
           </div>
         ) : (
           <button
+            type="button"
             className="upgrade-btn-lenavs"
             onClick={handleUpgrade}
             disabled={loadingUpgrade}
@@ -90,6 +91,7 @@ const Header = () => {
 
         {/* AJUDA */}
         <button
+          type="button"
           className="header-btn"
           onClick={() => setShowHelp(!showHelp)}
         >
@@ -99,6 +101,7 @@ const Header = () => {
 
         {/* PROJETOS */}
         <button
+          type="button"
           className="header-btn"
           onClick={() => setShowProjects(!showProjects)}
         >
@@ -108,6 +111,7 @@ const Header = () => {
 
         {/* LOGOUT */}
         <button
+          type="button"
           className="header-btn logout"
           onClick={handleLogout}
         >

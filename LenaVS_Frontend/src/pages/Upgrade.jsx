@@ -6,16 +6,20 @@ const Upgrade = () => {
 
   const handleSubscribe = async (currency) => {
     try {
-      const response = await api.post('/api/stripe/create-checkout-session', {
+      const response = await api.post('/payment/create-session', {
         currency
       });
 
       const { url } = response.data;
 
-      window.location.href = url;
+      if (url) {
+        window.location.href = url;
+      } else {
+        alert('Erro ao gerar link de pagamento.');
+      }
 
     } catch (error) {
-      console.error('Erro ao iniciar pagamento:', error);
+      console.error('Erro ao iniciar pagamento:', error.response?.data || error.message);
       alert('Erro ao iniciar pagamento.');
     }
   };
@@ -32,11 +36,11 @@ const Upgrade = () => {
 
         <div className="price-options">
           <button onClick={() => handleSubscribe('brl')}>
-            Assinar por R$29/mês
+            Assinar por R$39,90/mês
           </button>
 
           <button onClick={() => handleSubscribe('usd')}>
-            Subscribe for $9/month
+            Subscribe for $9.90/month
           </button>
         </div>
       </div>

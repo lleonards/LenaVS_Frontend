@@ -25,7 +25,7 @@ const Header = () => {
       const userLang = navigator.language || 'pt-BR';
       const currency = userLang.startsWith('en') ? 'USD' : 'BRL';
 
-      const res = await api.post('/payment/create-session', { currency });
+      const res = await api.post('api/payment/create-session', { currency });
 
       if (res.data && res.data.sessionUrl) {
         window.location.href = res.data.sessionUrl;

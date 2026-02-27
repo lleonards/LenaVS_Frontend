@@ -9,14 +9,17 @@ const Upgrade = () => {
     try {
       setLoading(currency);
 
-      const response = await api.post('/api/payment/create-session', {
+      // ⚠️ NÃO colocar /api aqui
+      const response = await api.post('/payment/create-session', {
         currency
       });
 
-      const { sessionUrl } = response.data;
+      const { url, sessionUrl } = response.data;
 
-      if (sessionUrl) {
-        window.location.href = sessionUrl;
+      const redirectUrl = sessionUrl || url;
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
       } else {
         alert('Erro ao gerar link de pagamento.');
       }

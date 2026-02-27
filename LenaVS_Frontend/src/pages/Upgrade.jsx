@@ -1,26 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import api from '../services/api';
 import './Upgrade.css';
 
 const Upgrade = () => {
+  const [loading, setLoading] = useState(null);
 
   const handleSubscribe = async (currency) => {
     try {
-      const response = await api.post('/payment/create-session', {
+      setLoading(currency);
+
+      const response = await api.post('/api/payment/create-session', {
         currency
       });
 
-      const { url } = response.data;
+      const { sessionUrl } = response.data;
 
-      if (url) {
-        window.location.href = url;
+      if (sessionUrl) {
+        window.location.href = sessionUrl;
       } else {
         alert('Erro ao gerar link de pagamento.');
       }
 
     } catch (error) {
-      console.error('Erro ao iniciar pagamento:', error.response?.data || error.message);
-      alert('Erro ao iniciar pagamento.');
+      console.error(
+        'Erro ao iniciar checkout:',
+        error.response?.data || error.message
+      );
+
+      alert(
+        error.response?.data?.error ||
+        'Erro ao iniciar pagamento.'
+      );
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -35,12 +47,22 @@ const Upgrade = () => {
         <p>✔ Prioridade de processamento</p>
 
         <div className="price-options">
-          <button onClick={() => handleSubscribe('brl')}>
-            Assinar por R$39,90/mês
+          <button
+            onClick={() => handleSubscribe('brl')}
+            disabled={loading !== null}
+          >
+            {loading === 'brl'
+              ? 'Redirecionando...'
+              : 'Assinar por R$39,90/mês'}
           </button>
 
-          <button onClick={() => handleSubscribe('usd')}>
-            Subscribe for $9.90/month
+          <button
+            onClick={() => handleSubscribe('usd')}
+            disabled={loading !== null}
+          >
+            {loading === 'usd'
+              ? 'Redirecting...'
+              : 'Subscribe for $9.90/month'}
           </button>
         </div>
       </div>

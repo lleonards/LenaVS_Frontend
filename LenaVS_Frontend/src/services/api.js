@@ -3,14 +3,17 @@ import { supabase } from './supabase';
 
 /* =====================================================
    🌍 BASE URL
-   O backend usa prefixo /api
+   Sempre adiciona /api automaticamente
 ===================================================== */
 
-const API_URL =
+const BASE =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.MODE === 'production'
-    ? 'https://lenavs-backend.onrender.com/api'
-    : 'http://localhost:10000/api');
+    ? 'https://lenavs-backend.onrender.com'
+    : 'http://localhost:10000');
+
+// 🔥 GARANTE que /api sempre esteja presente
+const API_URL = `${BASE}/api`;
 
 const api = axios.create({
   baseURL: API_URL,

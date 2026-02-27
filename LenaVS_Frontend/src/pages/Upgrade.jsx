@@ -6,32 +6,29 @@ const Upgrade = () => {
   const [loading, setLoading] = useState(null);
 
   const handleSubscribe = async (currency) => {
+    console.log('🔥 Botão clicado:', currency);
+
     try {
       setLoading(currency);
 
-      // ⚠️ NÃO colocar /api aqui
-      const response = await api.post('/payment/create-session', {
+      const { data } = await api.post('/payment/create-session', {
         currency
       });
 
-      const { url, sessionUrl } = response.data;
+      console.log('✅ Resposta da API:', data);
 
-      const redirectUrl = sessionUrl || url;
-
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
+      if (data?.sessionUrl) {
+        window.location.href = data.sessionUrl;
       } else {
-        alert('Erro ao gerar link de pagamento.');
+        alert('Erro: sessionUrl não retornada.');
       }
 
     } catch (error) {
-      console.error(
-        'Erro ao iniciar checkout:',
-        error.response?.data || error.message
-      );
+      console.error('❌ Erro ao iniciar checkout:', error);
 
       alert(
         error.response?.data?.error ||
+        error.message ||
         'Erro ao iniciar pagamento.'
       );
     } finally {
@@ -51,6 +48,7 @@ const Upgrade = () => {
 
         <div className="price-options">
           <button
+            type="button"
             onClick={() => handleSubscribe('brl')}
             disabled={loading !== null}
           >
@@ -60,6 +58,7 @@ const Upgrade = () => {
           </button>
 
           <button
+            type="button"
             onClick={() => handleSubscribe('usd')}
             disabled={loading !== null}
           >

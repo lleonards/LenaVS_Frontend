@@ -1,13 +1,16 @@
 import axios from 'axios';
 import { supabase } from './supabase';
 
-// 🔥 CORREÇÃO: Define a URL baseada no ambiente (Produção vs Local)
-// Se não houver uma variável VITE_API_URL configurada, ele decide inteligentemente.
-const API_URL = import.meta.env.VITE_API_URL || (
-  import.meta.env.MODE === 'production' 
-    ? 'https://lenavs-backend.onrender.com' 
-    : 'http://localhost:10000'
-);
+/* =====================================================
+   🌍 BASE URL
+   O backend usa prefixo /api
+===================================================== */
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.MODE === 'production'
+    ? 'https://lenavs-backend.onrender.com/api'
+    : 'http://localhost:10000/api');
 
 const api = axios.create({
   baseURL: API_URL,
@@ -49,7 +52,6 @@ api.interceptors.response.use(
   async (error) => {
     const status = error.response?.status;
 
-    // 🔥 TRATAR 401 E 403
     if (status === 401 || status === 403) {
       console.warn('Sessão inválida ou expirada. Limpando sessão...');
 

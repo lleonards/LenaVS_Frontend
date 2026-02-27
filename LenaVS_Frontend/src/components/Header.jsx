@@ -14,27 +14,31 @@ const Header = () => {
   const [loadingUpgrade, setLoadingUpgrade] = useState(false);
 
   /* =====================================================
-      ABRIR CHECKOUT STRIPE COM MOEDA DINÂMICA
+      ABRIR CHECKOUT STRIPE COM MOEDA PELO NAVEGADOR
   ===================================================== */
   const handleUpgrade = async () => {
-    if (loadingUpgrade) return; // previne múltiplos cliques
+    if (loadingUpgrade) return;
     setLoadingUpgrade(true);
 
     try {
-      // Detecta moeda pelo navegador (simples, pode melhorar depois)
+      // Detecta idioma do navegador
       const userLang = navigator.language || 'pt-BR';
-      const currency = userLang.startsWith('en') ? 'USD' : 'BRL';
 
-      const res = await api.post('api/payment/create-session', { currency });
+      // ⚠ IMPORTANTE: enviar minúsculo
+      const currency = userLang.startsWith('en') ? 'usd' : 'brl';
 
-      if (res.data && res.data.sessionUrl) {
-        window.location.href = res.data.sessionUrl;
+      const res = await api.post('/payment/create-session', { currency });
+
+      // ⚠ Alinhado com backend que retorna { url }
+      if (res.data && res.data.url) {
+        window.location.href = res.data.url;
       } else {
         alert('Não foi possível iniciar o checkout. Tente novamente.');
       }
+
     } catch (error) {
-      console.error('Erro ao iniciar checkout:', error);
-      alert('Erro ao iniciar o checkout. Tente novamente.');
+      console.error('Erro ao iniciar checkout:', error.response?.data || error.message);
+      alert('Erro ao iniciar o checkout.');
     } finally {
       setLoadingUpgrade(false);
     }
@@ -47,6 +51,7 @@ const Header = () => {
 
   return (
     <header className="header">
+
       {/* LOGO */}
       <div className="header-logo">
         <img
@@ -57,7 +62,8 @@ const Header = () => {
       </div>
 
       <div className="header-nav">
-        {/* BOTÃO DE UPGRADE / PRO */}
+
+        {/* BOTÃO PRO / UPGRADE */}
         {plan === 'pro' ? (
           <div className="pro-badge-v2">
             <Gem size={14} />
@@ -74,6 +80,7 @@ const Header = () => {
               <span className="credits-val">{credits ?? 0}</span>
               <span className="credits-label">Créditos</span>
             </div>
+
             <div className="upgrade-label">
               <ArrowUp size={14} />
               {loadingUpgrade ? 'Redirecionando...' : 'UPGRADE'}
@@ -81,12 +88,16 @@ const Header = () => {
           </button>
         )}
 
-        {/* BOTÕES DE NAVEGAÇÃO */}
-        <button className="header-btn" onClick={() => setShowHelp(!showHelp)}>
+        {/* AJUDA */}
+        <button
+          className="header-btn"
+          onClick={() => setShowHelp(!showHelp)}
+        >
           <HelpCircle size={20} />
           Ajuda
         </button>
 
+        {/* PROJETOS */}
         <button
           className="header-btn"
           onClick={() => setShowProjects(!showProjects)}
@@ -95,9 +106,14 @@ const Header = () => {
           Projetos
         </button>
 
-        <button className="header-btn logout" onClick={handleLogout}>
+        {/* LOGOUT */}
+        <button
+          className="header-btn logout"
+          onClick={handleLogout}
+        >
           <LogOut size={20} />
         </button>
+
       </div>
     </header>
   );

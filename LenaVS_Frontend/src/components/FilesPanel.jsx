@@ -35,7 +35,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
     try {
       setLoading(true);
 
-      const response = await api.post('/api/video/upload', formData);
+      const response = await api.post('/video/upload', formData);
 
       const publicUrl = response.data.files[type];
 
@@ -71,7 +71,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
     try {
       setLoading(true);
 
-      const response = await api.post('/api/lyrics/upload', formData);
+      const response = await api.post('/lyrics/upload', formData);
 
       const stanzasData = response.data.stanzas.map((text, idx) => ({
         id: idx,
@@ -118,7 +118,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
     try {
       setLoading(true);
 
-      const response = await api.post('/api/lyrics/manual', {
+      const response = await api.post('/lyrics/manual', {
         text: lyricsText
       });
 

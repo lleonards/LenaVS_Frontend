@@ -1,0 +1,167 @@
+/* =============================================
+   EDITOR PAGE - LAYOUT PRINCIPAL
+   ============================================= */
+
+/* Desktop: página fixa em 100vh, sem scroll externo */
+.editor-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d0d;
+  overflow: hidden;
+}
+
+/* ---- GRID PRINCIPAL ---- */
+.editor-main {
+  display: grid;
+  grid-template-columns: 200px 1fr 355px;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "left preview right"
+    "left export  right";
+  gap: 10px;
+  padding: 10px 14px 12px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---- ATRIBUIÇÃO DAS ÁREAS ---- */
+.editor-left     { grid-area: left; }
+.preview-wrapper { grid-area: preview; }
+.editor-right    { grid-area: right; }
+.export-wrapper  { grid-area: export; }
+
+/* ---- COLUNA ESQUERDA (Files Panel) ---- */
+.editor-left {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 14px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  /* Cobre as duas linhas do grid */
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  min-height: 0;
+}
+
+/* ---- COLUNA DIREITA (Lyrics Editor) ---- */
+.editor-right {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 14px 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* Cobre as duas linhas do grid */
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  min-height: 0;
+}
+
+/* ---- PREVIEW WRAPPER ---- */
+.preview-wrapper {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---- EXPORT WRAPPER ---- */
+.export-wrapper {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ---- PLACEHOLDER QUANDO SEM LETRA ---- */
+.placeholder-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: #555;
+  font-size: 13px;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* ============================================
+   RESPONSIVIDADE - TABLET (≤ 1280px)
+   ============================================ */
+@media (max-width: 1280px) {
+  .editor-main {
+    grid-template-columns: 185px 1fr 320px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .editor-main {
+    grid-template-columns: 175px 1fr 300px;
+    gap: 8px;
+    padding: 8px 10px 10px;
+  }
+}
+
+@media (max-width: 920px) {
+  .editor-main {
+    grid-template-columns: 160px 1fr 275px;
+    gap: 7px;
+    padding: 7px 8px 9px;
+  }
+}
+
+/* ============================================
+   RESPONSIVIDADE - CELULAR (≤ 768px)
+   Ordem: Uploads → Preview → Editor de Letras → Exportar
+   Com scroll habilitado
+   ============================================ */
+@media (max-width: 768px) {
+  /* Libera scroll no body para mobile */
+  .editor-container {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .editor-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "left"
+      "preview"
+      "right"
+      "export";
+    padding: 8px;
+    gap: 10px;
+    overflow: visible;
+    flex: none;
+  }
+
+  /* Remove o grid-row span nas colunas no mobile */
+  .editor-left {
+    grid-row: unset;
+    overflow-y: visible;
+    align-self: auto;
+    min-height: auto;
+    max-height: none;
+    padding: 14px;
+  }
+
+  .editor-right {
+    grid-row: unset;
+    overflow: visible;
+    align-self: auto;
+    min-height: auto;
+    max-height: none;
+    padding: 14px;
+  }
+
+  .preview-wrapper,
+  .export-wrapper {
+    width: 100%;
+    overflow: visible;
+  }
+}

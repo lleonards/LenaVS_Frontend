@@ -1,0 +1,181 @@
+/* =============================================
+   PREVIEW PANEL - Proporção 16:9 fixa
+   ============================================= */
+
+.preview-panel {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  /* NÃO usa flex:1 — altura determinada pelo conteúdo (16:9) */
+}
+
+.preview-panel h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #FF8C5A;
+  flex-shrink: 0;
+}
+
+/* ---- Área de vídeo/preview — SEMPRE 16:9 ---- */
+.preview-video {
+  width: 100%;
+  /* Proporção 16:9 fixa — sem flex, sem altura variável */
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.lyrics-display {
+  padding: 16px;
+  max-width: 90%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  animation: fadeIn 0.3s ease-in;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---- Controles ---- */
+.preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #252525;
+  border-radius: 7px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Botão Play */
+.control-btn {
+  background: #FF8C5A;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.control-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Tempo */
+.time-display {
+  min-width: 88px;
+  text-align: center;
+  font-size: 12px;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+/* Barra de progresso */
+.progress-bar {
+  flex: 1;
+  min-width: 60px;
+  height: 5px;
+  border-radius: 4px;
+  background: #444;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.progress-bar::-webkit-slider-runnable-track {
+  height: 5px;
+  background: #444;
+  border-radius: 4px;
+}
+
+.progress-bar::-moz-range-track {
+  height: 5px;
+  background: #444;
+  border-radius: 4px;
+}
+
+.progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #FF8C5A;
+  border-radius: 50%;
+  margin-top: -4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.progress-bar::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #FF8C5A;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Botão original/playback */
+.audio-switch-btn {
+  background: #333;
+  color: #fff;
+  padding: 6px 11px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.audio-switch-btn:hover {
+  background: #444;
+}
+
+/* Color picker */
+.preview-controls input[type="color"] {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 768px) {
+  .preview-controls {
+    gap: 8px;
+  }
+
+  .time-display {
+    min-width: 76px;
+    font-size: 11px;
+  }
+}

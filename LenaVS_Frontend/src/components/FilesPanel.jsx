@@ -33,11 +33,20 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
     try {
       setLoading(true);
+
       const response = await api.post('/video/upload', formData);
+
       const publicUrl = response.data.files[type];
+
       onFilesUploaded({ [type]: publicUrl });
-      setUploaded(prev => ({ ...prev, [type]: true }));
+
+      setUploaded(prev => ({
+        ...prev,
+        [type]: true
+      }));
+
       alert('Arquivo enviado com sucesso!');
+
     } catch (error) {
       console.error('Erro no upload:', error.response || error);
       alert(error.response?.data?.error || 'Erro ao enviar arquivo');
@@ -60,6 +69,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
     try {
       setLoading(true);
+
       const response = await api.post('/lyrics/upload', formData);
 
       const stanzasData = response.data.stanzas.map((text, idx) => ({
@@ -80,8 +90,14 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       }));
 
       onLyricsProcessed(stanzasData);
-      setUploaded(prev => ({ ...prev, letraArquivo: true }));
+
+      setUploaded(prev => ({
+        ...prev,
+        letraArquivo: true
+      }));
+
       alert(response.data.message);
+
     } catch (error) {
       console.error('Erro ao processar letra:', error.response || error);
       alert(error.response?.data?.error || 'Erro ao processar letra');
@@ -91,6 +107,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
   };
 
   const handleManualLyrics = async () => {
+
     if (!lyricsText.trim()) return;
 
     if (authLoading || !isAuthenticated) {
@@ -100,7 +117,10 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
     try {
       setLoading(true);
-      const response = await api.post('/lyrics/manual', { text: lyricsText });
+
+      const response = await api.post('/lyrics/manual', {
+        text: lyricsText
+      });
 
       const stanzasData = response.data.stanzas.map((text, idx) => ({
         id: idx,
@@ -120,10 +140,17 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
       }));
 
       onLyricsProcessed(stanzasData);
+
       setShowTextInput(false);
       setLyricsText('');
-      setUploaded(prev => ({ ...prev, letraManual: true }));
+
+      setUploaded(prev => ({
+        ...prev,
+        letraManual: true
+      }));
+
       alert(response.data.message);
+
     } catch (error) {
       console.error('Erro ao processar letra manual:', error.response || error);
       alert(error.response?.data?.error || 'Erro ao processar letra');
@@ -134,6 +161,7 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
 
   return (
     <div className="files-panel">
+
       <h2>Arquivos</h2>
 
       <div className="upload-section">
@@ -142,10 +170,11 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
         <label className="upload-btn">
           <Upload size={15} />
           <span>Música Original</span>
-          {uploaded.musicaOriginal
-            ? <span className="upload-check">✓</span>
-            : null
+
+          {uploaded.musicaOriginal &&
+            <span className="upload-check">✓</span>
           }
+
           <input
             type="file"
             accept="audio/*"
@@ -154,14 +183,16 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           />
         </label>
 
+
         {/* Música Instrumental */}
         <label className="upload-btn">
           <Upload size={15} />
           <span>Música Instrumental</span>
-          {uploaded.musicaInstrumental
-            ? <span className="upload-check">✓</span>
-            : null
+
+          {uploaded.musicaInstrumental &&
+            <span className="upload-check">✓</span>
           }
+
           <input
             type="file"
             accept="audio/*"
@@ -170,17 +201,23 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           />
         </label>
 
-        {/* Divisor opcional */}
-        <div className="upload-divider">opcional</div>
 
-        {/* Vídeo/Foto - opcional */}
+        {/* DIVISOR OPCIONAL */}
+        <div className="upload-divider">
+          OPCIONAL
+        </div>
+
+
+        {/* Vídeo ou Foto */}
         <label className="upload-btn">
           <Upload size={15} />
           <span>Vídeo / Foto</span>
+
           {uploaded.video
             ? <span className="upload-check">✓</span>
-            : <span className="upload-optional">opcional</span>
+            : <span className="upload-optional">OPCIONAL</span>
           }
+
           <input
             type="file"
             accept="video/*,image/*"
@@ -189,17 +226,22 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           />
         </label>
 
-        {/* Divisor letra */}
-        <div className="upload-divider">letra</div>
 
-        {/* Letra por arquivo */}
+        {/* DIVISOR LETRA */}
+        <div className="upload-divider">
+          LETRA
+        </div>
+
+
+        {/* Letra arquivo */}
         <label className="upload-btn">
           <Upload size={15} />
           <span>Letra (arquivo)</span>
-          {uploaded.letraArquivo
-            ? <span className="upload-check">✓</span>
-            : null
+
+          {uploaded.letraArquivo &&
+            <span className="upload-check">✓</span>
           }
+
           <input
             type="file"
             accept=".txt,.docx,.pdf"
@@ -208,32 +250,46 @@ const FilesPanel = ({ onLyricsProcessed, onFilesUploaded }) => {
           />
         </label>
 
+
         {/* Colar letra */}
         <button
           className="upload-btn"
           onClick={() => setShowTextInput(!showTextInput)}
           disabled={loading}
         >
+
           <Type size={15} />
           <span>Colar Letra</span>
-          {uploaded.letraManual && <span className="upload-check">✓</span>}
+
+          {uploaded.letraManual &&
+            <span className="upload-check">✓</span>
+          }
+
         </button>
 
       </div>
 
+
       {showTextInput && (
         <div className="text-input-section">
+
           <textarea
             value={lyricsText}
             onChange={(e) => setLyricsText(e.target.value)}
             placeholder="Cole a letra aqui..."
             rows="6"
           />
-          <button onClick={handleManualLyrics} disabled={loading}>
+
+          <button
+            onClick={handleManualLyrics}
+            disabled={loading}
+          >
             {loading ? 'Processando...' : 'Processar Letra'}
           </button>
+
         </div>
       )}
+
     </div>
   );
 };

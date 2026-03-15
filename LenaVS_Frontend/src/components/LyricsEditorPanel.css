@@ -1,0 +1,314 @@
+/* =============================================
+   LYRICS EDITOR PANEL
+   ============================================= */
+
+.lyrics-editor-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---- Header do painel ---- */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.panel-header h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FF8C5A;
+}
+
+.add-stanza-btn {
+  background: #FF8C5A;
+  color: #000;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.add-stanza-btn:hover {
+  background: #ff7a45;
+  transform: scale(1.05);
+}
+
+/* ---- Lista de estrofes (com scroll) ---- */
+.stanzas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 3px;
+}
+
+/* Scrollbar customizada */
+.stanzas-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.stanzas-list::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.stanzas-list::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 4px;
+}
+
+.stanzas-list::-webkit-scrollbar-thumb:hover {
+  background: #FF8C5A;
+}
+
+/* ---- Bloco de cada estrofe ---- */
+.stanza-block {
+  background: #222;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  border: 1px solid #2e2e2e;
+  transition: border-color 0.2s;
+  /* Garante que não ultrapasse o container */
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stanza-block:hover {
+  border-color: #3a3a3a;
+}
+
+/* ---- Textarea da estrofe ---- */
+.stanza-block textarea {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 10px;
+  color: #fff;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.55;
+  width: 100%;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.stanza-block textarea:focus {
+  outline: none;
+  border-color: #FF8C5A;
+}
+
+/* ---- Inputs de tempo + tamanho ---- */
+/* Usa flex-wrap para nunca sair da tela */
+.time-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.time-inputs > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  /* Cada campo tem tamanho mínimo mas cresce igualmente */
+  flex: 1 1 70px;
+  min-width: 70px;
+  box-sizing: border-box;
+}
+
+.time-inputs label {
+  font-size: 10px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.time-inputs input {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
+  padding: 6px 8px;
+  color: #fff;
+  font-size: 13px;
+  height: 32px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.time-inputs input:focus {
+  outline: none;
+  border-color: #FF8C5A;
+}
+
+/* Label tamanho do texto */
+.font-size-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 70px;
+  min-width: 70px;
+  box-sizing: border-box;
+}
+
+.font-size-group label {
+  font-size: 10px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.font-size-group input {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
+  padding: 6px 8px;
+  color: #fff;
+  width: 100%;
+  font-size: 13px;
+  height: 32px;
+  box-sizing: border-box;
+}
+
+/* ---- Controles de estilo (cores + formatação) ---- */
+.style-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.style-controls input[type="color"] {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 1px;
+  background: #2a2a2a;
+  flex-shrink: 0;
+}
+
+.style-controls button,
+.alignment-controls button {
+  background: #2a2a2a;
+  color: #ccc;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #3a3a3a;
+  cursor: pointer;
+  transition: 0.15s;
+  flex-shrink: 0;
+}
+
+.style-controls button:hover,
+.alignment-controls button:hover {
+  background: #333;
+}
+
+.style-controls button.active,
+.alignment-controls button.active {
+  background: #FF8C5A;
+  color: #000;
+  border-color: #FF8C5A;
+}
+
+/* ---- Alinhamento ---- */
+.alignment-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ---- Transição ---- */
+.transition-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.transition-controls select {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 5px;
+  padding: 5px 8px;
+  color: #fff;
+  font-size: 12px;
+  height: 30px;
+  flex: 0 0 auto;
+  min-width: 80px;
+}
+
+.transition-label {
+  font-size: 11px;
+  color: #666;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.transition-controls input[type="range"] {
+  flex: 1;
+  min-width: 60px;
+  height: 4px;
+  accent-color: #FF8C5A;
+}
+
+/* ---- Botão remover ---- */
+.remove-stanza-btn {
+  background: transparent;
+  color: #ff5555;
+  padding: 6px 10px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  border: 1px solid #3a2222;
+  cursor: pointer;
+  transition: 0.15s;
+  align-self: flex-end;
+}
+
+.remove-stanza-btn:hover {
+  background: #ff4444;
+  color: #fff;
+  border-color: #ff4444;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 768px) {
+  .stanzas-list {
+    overflow-y: visible;
+    flex: none;
+  }
+
+  .lyrics-editor-panel {
+    height: auto;
+  }
+}

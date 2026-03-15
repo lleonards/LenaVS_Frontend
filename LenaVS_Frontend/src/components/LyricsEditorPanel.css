@@ -1,0 +1,410 @@
+/* =============================================
+   LYRICS EDITOR PANEL — redesign visual
+   (proporções do painel intactas)
+   ============================================= */
+
+/* ── Painel geral ─────────────────────────── */
+.lyrics-editor-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Header ──────────────────────────────── */
+.lep-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.lep-header h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #FF8C5A;
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+
+.lep-add-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #FF8C5A;
+  color: #000;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.lep-add-btn:hover {
+  background: #ff7a45;
+  transform: scale(1.08);
+}
+
+/* ── Lista com scroll ─────────────────────── */
+.lep-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+  padding-bottom: 4px;
+}
+
+/* Scrollbar */
+.lep-list::-webkit-scrollbar        { width: 4px; }
+.lep-list::-webkit-scrollbar-track  { background: #1a1a1a; }
+.lep-list::-webkit-scrollbar-thumb  { background: #3a3a3a; border-radius: 4px; }
+.lep-list::-webkit-scrollbar-thumb:hover { background: #FF8C5A; }
+
+/* ── Empty state ──────────────────────────── */
+.lep-empty {
+  text-align: center;
+  color: #555;
+  font-size: 13px;
+  padding: 32px 16px;
+  line-height: 1.6;
+}
+
+/* ── Bloco de cada estrofe ────────────────── */
+.lep-block {
+  background: #222;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+.lep-block:hover {
+  border-color: #3a3a3a;
+}
+
+/* ── Header do bloco ──────────────────────── */
+.lep-block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lep-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.lep-block-title {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* ── Textarea ────────────────────────────── */
+.lep-textarea {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 7px;
+  padding: 10px 11px;
+  color: #eee;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 100px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.lep-textarea:focus {
+  outline: none;
+  border-color: #FF8C5A;
+}
+
+/* ── Campos genéricos ─────────────────────── */
+.lep-label {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  white-space: nowrap;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.lep-label-center {
+  text-align: center;
+}
+
+.lep-input {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 7px 9px;
+  color: #fff;
+  font-size: 13px;
+  height: 34px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.lep-input:focus {
+  outline: none;
+  border-color: #FF8C5A;
+}
+
+.lep-input-num {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #FF8C5A;
+}
+
+.lep-select {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: #fff;
+  font-size: 13px;
+  height: 34px;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.lep-select:focus {
+  outline: none;
+  border-color: #FF8C5A;
+}
+
+/* ── Linha: Início / Fim ──────────────────── */
+.lep-time-row {
+  display: flex;
+  gap: 10px;
+}
+
+.lep-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.lep-field-sm {
+  flex: 0 0 72px;
+}
+
+.lep-field-grow {
+  flex: 1;
+}
+
+/* ── Linha: Tamanho + Fonte ───────────────── */
+.lep-font-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* ── Linha: Cores + B I U ─────────────────── */
+.lep-style-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Color swatch (caixa clicável de cor) */
+.lep-color-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.lep-color-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 7px;
+  border: 2px solid #444;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.lep-color-swatch:hover {
+  border-color: #FF8C5A;
+  transform: scale(1.06);
+}
+
+.lep-color-swatch-outline {
+  /* outline swatch tem borda branca para distinguir do fundo */
+  border-color: #555;
+}
+
+.lep-color-swatch input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Separador vertical entre cores e formatação */
+.lep-style-sep {
+  width: 1px;
+  height: 30px;
+  background: #333;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* Botões de estilo (B / I / U) */
+.lep-style-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 7px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  color: #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.lep-style-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+.lep-style-btn.active {
+  background: #FF8C5A;
+  color: #000;
+  border-color: #FF8C5A;
+}
+
+/* ── Linha: Alinhamento ───────────────────── */
+.lep-align-row {
+  display: flex;
+  gap: 8px;
+}
+
+.lep-align-btn {
+  flex: 1;
+  height: 36px;
+  border-radius: 7px;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.lep-align-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+.lep-align-btn.active {
+  background: #FF8C5A;
+  color: #000;
+  border-color: #FF8C5A;
+}
+
+/* ── Linha: Transição ─────────────────────── */
+.lep-transition-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lep-select-transition {
+  flex: 0 0 110px;
+}
+
+.lep-slider {
+  flex: 1;
+  height: 4px;
+  accent-color: #4a9eff;
+  cursor: pointer;
+  min-width: 40px;
+}
+
+.lep-slider-val {
+  font-size: 11px;
+  color: #777;
+  flex-shrink: 0;
+  min-width: 26px;
+  text-align: right;
+}
+
+/* ── Botão Remover ───────────────────────── */
+.lep-remove-btn {
+  width: 100%;
+  background: #cc3333;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lep-remove-btn:hover {
+  background: #e53030;
+}
+
+/* ── Mobile ──────────────────────────────── */
+@media (max-width: 768px) {
+  .lep-list {
+    overflow-y: visible;
+    flex: none;
+  }
+
+  .lyrics-editor-panel {
+    height: auto;
+  }
+}

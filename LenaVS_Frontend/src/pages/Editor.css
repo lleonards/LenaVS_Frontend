@@ -1,0 +1,196 @@
+/* =============================================
+   EDITOR PAGE - LAYOUT PRINCIPAL
+   ============================================= */
+
+/* Desktop: a página inteira fica fixa em 100vh, sem scroll no body */
+.editor-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d0d;
+  overflow: hidden;
+}
+
+/* ---- GRID PRINCIPAL ---- */
+.editor-main {
+  display: grid;
+
+  /*
+    ✅ Ajuste de layout (Desktop)
+    - Aumenta o painel de Uploads (left)
+    - Diminui o painel de Preview/Export (centro)
+    - Mantém o painel de Letras (right) estável
+
+    O centro fica com um "teto" (max) para o preview não ficar largo demais.
+    Assim o container 16:9 não fica “esticado” em telas grandes.
+  */
+  /*
+    Layout base (Desktop)
+    - 3 colunas
+    - Preview + Export sempre dentro da viewport (sem “sumir”)
+      -> a 1ª linha vira minmax(0, 1fr) para não crescer além do espaço.
+      -> se o Preview ficar alto, ele rola dentro do próprio painel.
+  */
+  grid-template-columns:
+    clamp(240px, 28vw, 420px)  /* Uploads (maior) */
+    minmax(340px, 560px)       /* Preview/Export (controlado) */
+    minmax(260px, 1fr);        /* Letras (flexível) */
+
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "left preview right"
+    "left export  right";
+  gap: 10px;
+  padding: 10px 14px 14px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---- ATRIBUIÇÃO DAS ÁREAS ---- */
+.editor-left     { grid-area: left; }
+.preview-wrapper { grid-area: preview; }
+.editor-right    { grid-area: right; }
+.export-wrapper  { grid-area: export; }
+
+/* ---- COLUNA ESQUERDA (Files Panel) ---- */
+.editor-left {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-height: 0;
+}
+
+/* ---- PREVIEW WRAPPER ---- */
+.preview-wrapper {
+  min-width: 0;
+  min-height: 0;          /* importante para o minmax(0,1fr) funcionar */
+  overflow: hidden;       /* ✅ sem scroll: o preview se ajusta para caber */
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+/* ---- EXPORT WRAPPER ---- */
+.export-wrapper {
+  min-width: 0;
+  align-self: start;
+}
+
+/* ---- COLUNA DIREITA (Lyrics Editor) ---- */
+.editor-right {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-height: 0;
+}
+
+/* ---- PLACEHOLDER QUANDO SEM LETRA ---- */
+.placeholder-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: #555;
+  font-size: 13px;
+  padding: 20px;
+}
+
+/* ============================================
+   RESPONSIVIDADE - TABLET (≤ 1200px)
+   ============================================ */
+/* ============================================
+   RESPONSIVIDADE - TABLET / NOTEBOOK (≤ 1200px)
+   Mantém 3 colunas, mas reduz larguras
+   ============================================ */
+@media (max-width: 1200px) {
+  .editor-main {
+    grid-template-columns:
+      clamp(220px, 30vw, 360px)
+      minmax(320px, 520px)
+      minmax(240px, 1fr);
+  }
+}
+
+/* ============================================
+   RESPONSIVIDADE - TABLET (≤ 1100px)
+   2 colunas: Uploads + Preview/Export lado a lado; Letras abaixo
+   (evita “exportar” ficar fora da tela)
+   ============================================ */
+@media (max-width: 1100px) {
+  .editor-main {
+    grid-template-columns: minmax(220px, 320px) 1fr;
+    grid-template-rows: minmax(0, 1fr) auto minmax(260px, 1fr);
+    grid-template-areas:
+      "left  preview"
+      "left  export"
+      "right right";
+  }
+}
+
+@media (max-width: 1024px) {
+  .editor-main {
+    /* apenas refina o espaçamento */
+    gap: 8px;
+    padding: 10px;
+  }
+}
+
+/* ============================================
+   RESPONSIVIDADE - CELULAR (≤ 768px)
+   Ordem: Files → Preview → LyricsEditor → Export
+   ============================================ */
+@media (max-width: 768px) {
+  /* Libera scroll no body para mobile */
+  .editor-container {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .editor-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "left"
+      "preview"
+      "right"
+      "export";
+    padding: 8px;
+    gap: 8px;
+    overflow: visible;
+    flex: none;
+  }
+
+  .editor-left {
+    overflow-y: visible;
+    align-self: auto;
+    min-height: auto;
+    max-height: none;
+  }
+
+  .editor-right {
+    overflow-y: visible;
+    align-self: auto;
+    min-height: auto;
+    max-height: none;
+  }
+
+  .preview-wrapper,
+  .export-wrapper {
+    width: 100%;
+  }
+
+  .preview-wrapper {
+    overflow: visible; /* não corta o preview no mobile */
+  }
+}

@@ -136,14 +136,16 @@ const Header = ({ onOpenProjects = () => {} }) => {
                   Guia completo
                 </button>
 
-                <a
-                  className="header-dropdown__item"
-                  href="mailto:noreply@lenavs.com?subject=Suporte%20LenaVS"
-                  onClick={() => setShowHelpMenu(false)}
-                >
-                  <LifeBuoy size={16} />
-                  Suporte
-                </a>
+               <a
+  className="header-dropdown__item"
+  href="https://mail.google.com/mail/?view=cm&fs=1&to=noreply@lenavs.com&subject=Suporte%20LenaVS"
+  target="_blank"
+  rel="noopener noreferrer"
+  onClick={() => setShowHelpMenu(false)}
+>
+  <LifeBuoy size={16} />
+  Suporte
+</a>
               </div>
             ) : null}
           </div>

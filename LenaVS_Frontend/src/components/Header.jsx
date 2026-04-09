@@ -15,12 +15,21 @@ import api from '../services/api';
 import './Header.css';
 
 const GUIDE_STEPS = [
-  'Faça upload da letra, áudio original/playback e um fundo em vídeo, imagem ou cor.',
-  'Revise as estrofes no Editor de Letras, ajuste início/fim e personalize fonte, tamanho, cor e borda.',
-  'Use o Preview para tocar o áudio, arrastar a posição da letra e conferir cada estrofe em tempo real.',
-  'No painel de exportação, defina o nome do projeto. Esse mesmo nome aparecerá no histórico.',
-  'Ao exportar, o projeto é salvo e publicado automaticamente. Depois você pode despublicar em Projetos > Histórico.',
-  'Em Projetos > Biblioteca, você pode pesquisar projetos públicos, abrir uma cópia e editar sem alterar o original.',
+  'Faça upload dos arquivos: música original, música instrumental, fundo em imagem/vídeo (opcional) e a letra da música (arquivo ou texto colado).',
+
+  'No painel Editor de Letras, configure cada estrofe: defina o tempo inicial e final, ajuste o tamanho, fonte, cor, contorno e estilos (negrito, itálico, sublinhado), além da transição e duração.',
+
+  'Todas as alterações feitas no Editor de Letras são refletidas automaticamente no preview.',
+
+  'No preview, utilize o player para sincronizar as estrofes com a música. É possível alternar entre o áudio original e o instrumental para auxiliar na criação do karaokê.',
+
+  'Ainda no preview, você pode ajustar o fundo do vídeo, incluindo a escolha de cor quando não houver imagem ou vídeo.',
+
+  'No painel Exportar Vídeo, defina o nome do projeto, a resolução, o formato do vídeo e escolha qual áudio será utilizado no resultado final (original ou instrumental).',
+
+  'Clique em exportar para gerar o vídeo. O sistema irá processar todas as configurações e iniciar o download automaticamente.',
+
+  'Cada exportação consome 1 crédito.'
 ];
 
 const Header = ({ onOpenProjects = () => {} }) => {

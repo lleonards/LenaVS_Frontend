@@ -6,13 +6,13 @@ import './Upgrade.css';
 
 const PAYMENT_OPTIONS = [
   {
-    id: 'mercadopago-pix-boleto',
+    id: 'mercadopago-pix',
     provider: 'mercadopago',
-    paymentMethod: 'pix_or_boleto',
-    title: 'Pix / Boleto',
+    paymentMethod: 'pix',
+    title: 'Pix',
     icon: QrCode,
     bullets: ['Pagamento instantâneo', 'Liberação automática'],
-    cta: 'Continuar com Pix ou Boleto',
+    cta: 'Continuar com Pix',
   },
   {
     id: 'stripe-card',

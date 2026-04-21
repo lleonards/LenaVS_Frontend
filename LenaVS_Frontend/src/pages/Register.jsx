@@ -10,8 +10,6 @@ const COUNTRY_OPTIONS = [
   { value: 'CA', label: 'Canadá' },
   { value: 'AU', label: 'Austrália' },
   { value: 'NZ', label: 'Nova Zelândia' },
-  { value: 'SG', label: 'Singapura' },
-  { value: 'HK', label: 'Hong Kong' },
   { value: 'OTHER', label: 'Outros' },
 ];
 

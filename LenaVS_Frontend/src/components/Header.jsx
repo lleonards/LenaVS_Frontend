@@ -174,17 +174,23 @@ const Header = ({ onOpenProjects = () => {} }) => {
               <span>{openingCheckout ? 'Abrindo checkout...' : 'Limite gratuito atingido. Ative o LenaVS Unlimited'}</span>
             </button>
           ) : (
-            <div className="header-inline-help-notice">
-              <span>Não entendeu? Confira </span>
-              <button type="button" className="header-inline-help-link" onClick={openGuideModal}>
-                Ajuda → guia
-              </button>
-              <span> ou entre em contato com o </span>
-              <a className="header-inline-help-link" href={SUPPORT_HREF}>
-                suporte
-              </a>
-              <span>.</span>
-            </div>
+           <div className="header-inline-help-notice">
+  Não entendeu? Confira{" "}
+
+  <button
+    type="button"
+    className="header-inline-help-link"
+    onClick={openGuideModal}
+  >
+    Ajuda → guia
+  </button>
+
+  {" ou entre em contato com o "}
+
+  <a className="header-inline-help-link" href={SUPPORT_HREF}>
+    suporte
+  </a>.
+</div>
           )}
         </div>
 

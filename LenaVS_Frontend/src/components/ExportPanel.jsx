@@ -88,18 +88,18 @@ const ExportPanel = ({
 
   useEffect(() => {
     if (!loading) {
-      setLoadingLabel('criando video');
+      setLoadingLabel('Criando video...');
       return undefined;
     }
 
-    setLoadingLabel('criando video');
+    setLoadingLabel('Criando video...');
 
     const almostThereTimeout = window.setTimeout(() => {
-      setLoadingLabel('quase lá');
+      setLoadingLabel('Quase lá...');
     }, 40000);
 
     const creatingAgainTimeout = window.setTimeout(() => {
-      setLoadingLabel('criando video');
+      setLoadingLabel('Criando video...');
     }, 55000);
 
     return () => {

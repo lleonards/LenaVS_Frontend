@@ -46,6 +46,17 @@ const Login = () => {
           />
         </div>
 
+        {/* 🔥 SEO (discreto para o usuário, forte para o Google) */}
+        <p className="seo-description">
+          Crie vídeos de karaokê facilmente com o LenaVS. 
+          Sincronize letras, personalize o visual e exporte em poucos cliques.
+        </p>
+
+        {/* 🔥 Reforço SEO (invisível) */}
+        <h1 style={{ display: 'none' }}>
+          Criar karaokê online - LenaVS
+        </h1>
+
         <h1 className="login-title">Login</h1>
 
         {error && <div className="error-message">{error}</div>}

@@ -70,7 +70,21 @@ const GUIDE_PANELS = [
     },
     bubbleTone: 'blue',
     bubbleText:
-      'Aqui você ajusta cada parte da letra.\nCada bloco pode ser editado, reorganizado ou duplicado.\nVocê define o tempo de início e fim de cada estrofe e também pode ajustar o visual: fonte, cor, tamanho, alinhamento e efeitos.\nAo clicar em um bloco com tempo definido, o preview vai direto para o início dele.\nAtalhos do editor: ↑/↓ navegam entre blocos, Enter seleciona a estrofe atual, M marca o início e N marca o fim no tempo atual do preview.\nEsse é o painel principal para deixar o karaokê sincronizado e com boa aparência.',
+      'Aqui você ajusta e sincroniza cada parte da letra.
+
+Os blocos podem ser editados, reorganizados ou duplicados facilmente.
+
+Defina o tempo de início e fim de cada estrofe e personalize o visual com fonte, cor, tamanho, alinhamento e efeitos.
+
+Ao clicar em um bloco com tempo definido, o preview vai direto para o início dele.
+
+Atalhos úteis:
+Setas “↑” e “↓” navegam entre os blocos
+“Enter” seleciona a estrofe atual
+“M” marca o início
+“N” marca o fim
+
+Esse é o principal painel para deixar o karaokê sincronizado e com boa aparência.',
   },
   {
     id: 'preview',
@@ -91,7 +105,19 @@ const GUIDE_PANELS = [
     },
     bubbleTone: 'green',
     bubbleText:
-      'Aqui você vê como o vídeo está ficando.\nUse os controles para reproduzir a música e conferir se a letra está aparecendo no tempo certo.\nO preview mostra o resultado com estilo, transições e sincronização, antes da exportação.\nAtalhos do preview: Espaço reproduz/pausa, Ctrl + → avança 1 segundo, Ctrl + ← volta 1 segundo e T alterna entre áudio original e playback.\nTambém é possível mudar cor de fundo, e alternar entre ouvir a música original ou o playback.',
+      'Aqui você acompanha como o vídeo está ficando antes da exportação.
+
+Use os controles para reproduzir a música e conferir se a letra aparece no tempo certo.
+
+O preview mostra o resultado com estilo, transições e sincronização em tempo real.
+
+Atalhos úteis:
+“Espaço” reproduz ou pausa
+“Ctrl + →” avança 1 segundo
+“Ctrl + ←” volta 1 segundo
+“T” alterna entre música original e playback
+
+Também é possível mudar a cor de fundo e alternar entre ouvir a música original ou a versão instrumental.',
   },
   {
     id: 'exportar',

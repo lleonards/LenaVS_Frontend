@@ -175,21 +175,18 @@ const Header = ({ onOpenProjects = () => {} }) => {
             </button>
           ) : (
             <div className="header-inline-help-notice">
-              <span className="header-inline-help-text">Não entendeu?</span>
-              <span className="header-inline-help-text">Confira</span>
-              <button
-                type="button"
-                className="header-inline-help-link"
-                onClick={openGuideModal}
-              >
-                Ajuda → guia
-              </button>
-              <span className="header-inline-help-text">ou entre em contato com o</span>
-              <a className="header-inline-help-link" href={SUPPORT_HREF}>
-                suporte
-              </a>
-              <span className="header-inline-help-text">.</span>
-            </div>
+  <span className="header-inline-help-text">
+    Novo na LenaVS?
+  </span>
+
+  <button
+    type="button"
+    className="header-inline-help-link"
+    onClick={openGuideModal}
+  >
+    Confira Ajuda → Guia
+  </button>
+</div>
           )}
         </div>
 

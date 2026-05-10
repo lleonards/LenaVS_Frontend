@@ -176,7 +176,7 @@ const Header = ({ onOpenProjects = () => {} }) => {
           ) : (
             <div className="header-inline-help-notice">
   <span className="header-inline-help-text">
-    Novo na LenaVS?
+    Novo na LenaVS? Confira
   </span>
 
   <button
@@ -184,7 +184,7 @@ const Header = ({ onOpenProjects = () => {} }) => {
     className="header-inline-help-link"
     onClick={openGuideModal}
   >
-    Confira Ajuda → Guia
+    Ajuda → Guia
   </button>
 </div>
           )}

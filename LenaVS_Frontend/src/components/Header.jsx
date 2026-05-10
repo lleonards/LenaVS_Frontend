@@ -115,7 +115,7 @@ Atalhos úteis:
 “Espaço” reproduz ou pausa
 “Ctrl + →” avança 1 segundo
 “Ctrl + ←” volta 1 segundo
-“T” alterna entre música original e playback
+“T” alterna entre música original e playba
 
 Também é possível mudar a cor de fundo e alternar entre ouvir a música original ou a versão instrumental.',
   },

@@ -3,6 +3,7 @@ import { DEFAULT_TIMECODE, normalizeFixedTimecode } from '../utils/timecode';
 
 const EDITABLE_POSITIONS = [0, 1, 3, 4];
 const CARET_BY_DIGIT_INDEX = [0, 1, 3, 4, 5];
+
 const NON_TEXT_INPUT_TYPES = new Set([
   'button',
   'checkbox',
@@ -16,13 +17,14 @@ const NON_TEXT_INPUT_TYPES = new Set([
   'submit',
 ]);
 
-const countEditableBeforeCaret = (caretPosition = 0) => EDITABLE_POSITIONS
-  .filter((position) => position < caretPosition)
-  .length;
+const countEditableBeforeCaret = (caretPosition = 0) =>
+  EDITABLE_POSITIONS.filter((position) => position < caretPosition).length;
 
-const digitIndexToCaret = (digitIndex = 0) => CARET_BY_DIGIT_INDEX[Math.max(0, Math.min(4, digitIndex))];
+const digitIndexToCaret = (digitIndex = 0) =>
+  CARET_BY_DIGIT_INDEX[Math.max(0, Math.min(4, digitIndex))];
 
-const getDigitsFromValue = (value) => normalizeFixedTimecode(value, DEFAULT_TIMECODE).replace(':', '');
+const getDigitsFromValue = (value) =>
+  normalizeFixedTimecode(value, DEFAULT_TIMECODE).replace(':', '');
 
 const digitsToTimecode = (digits) => {
   const safeDigits = String(digits ?? '')
@@ -47,13 +49,19 @@ const TimecodeInput = ({
 }) => {
   const inputRef = useRef(null);
   const pendingSelectionRef = useRef(null);
-  const displayValue = useMemo(() => normalizeFixedTimecode(value, DEFAULT_TIMECODE), [value]);
+
+  const displayValue = useMemo(
+    () => normalizeFixedTimecode(value, DEFAULT_TIMECODE),
+    [value]
+  );
 
   useLayoutEffect(() => {
     if (!inputRef.current || pendingSelectionRef.current === null) return;
 
     const caretPosition = pendingSelectionRef.current;
+
     inputRef.current.setSelectionRange(caretPosition, caretPosition);
+
     pendingSelectionRef.current = null;
   }, [displayValue]);
 
@@ -64,10 +72,13 @@ const TimecodeInput = ({
 
   const handleDigitInput = useCallback((digit, selectionStart, selectionEnd) => {
     const digits = getDigitsFromValue(displayValue).split('');
+
     const startDigit = countEditableBeforeCaret(selectionStart);
     const endDigit = countEditableBeforeCaret(selectionEnd);
+
     const targetDigit = Math.min(startDigit, 3);
 
+    // Impede segundos acima de 59
     if (targetDigit === 2 && Number(digit) > 5) {
       return;
     }
@@ -77,58 +88,95 @@ const TimecodeInput = ({
     }
 
     digits[targetDigit] = digit;
-    applyNextValue(digits.join(''), Math.min(targetDigit + 1, 4));
+
+    applyNextValue(
+      digits.join(''),
+      Math.min(targetDigit + 1, 4)
+    );
   }, [applyNextValue, displayValue]);
 
   const handleBackspace = useCallback((selectionStart, selectionEnd) => {
     const digits = getDigitsFromValue(displayValue).split('');
+
     const startDigit = countEditableBeforeCaret(selectionStart);
     const endDigit = countEditableBeforeCaret(selectionEnd);
 
+    // Quando houver seleção
     if (startDigit !== endDigit) {
       for (let index = startDigit; index < endDigit; index += 1) {
-        digits[index] = '0';
+        digits[index] = '';
       }
-      applyNextValue(digits.join(''), startDigit);
+
+      applyNextValue(
+        digits.join('').padEnd(4, '0'),
+        startDigit
+      );
+
       return;
     }
 
-    if (startDigit === 0) {
+    // Não deixa apagar antes do primeiro dígito
+    if (startDigit <= 0) {
       return;
     }
 
-    const targetDigit = Math.max(0, startDigit - 1);
-    digits[targetDigit] = '0';
-    applyNextValue(digits.join(''), targetDigit);
+    // Backspace apaga o número anterior
+    const targetDigit = startDigit - 1;
+
+    digits[targetDigit] = '';
+
+    applyNextValue(
+      digits.join('').padEnd(4, '0'),
+      targetDigit
+    );
   }, [applyNextValue, displayValue]);
 
   const handleDelete = useCallback((selectionStart, selectionEnd) => {
     const digits = getDigitsFromValue(displayValue).split('');
+
     const startDigit = countEditableBeforeCaret(selectionStart);
     const endDigit = countEditableBeforeCaret(selectionEnd);
 
+    // Quando houver seleção
     if (startDigit !== endDigit) {
       for (let index = startDigit; index < endDigit; index += 1) {
-        digits[index] = '0';
+        digits[index] = '';
       }
-      applyNextValue(digits.join(''), startDigit);
+
+      applyNextValue(
+        digits.join('').padEnd(4, '0'),
+        startDigit
+      );
+
       return;
     }
 
+    // Não deixa apagar depois do último dígito
     if (startDigit >= 4) {
       return;
     }
 
-    digits[startDigit] = '0';
-    applyNextValue(digits.join(''), startDigit);
+    // Delete apaga o número atual
+    digits[startDigit] = '';
+
+    applyNextValue(
+      digits.join('').padEnd(4, '0'),
+      startDigit
+    );
   }, [applyNextValue, displayValue]);
 
   const moveCaret = useCallback((nextDigitIndex) => {
     pendingSelectionRef.current = digitIndexToCaret(nextDigitIndex);
+
     requestAnimationFrame(() => {
-      if (!inputRef.current || pendingSelectionRef.current === null) return;
+      if (!inputRef.current || pendingSelectionRef.current === null) {
+        return;
+      }
+
       const caretPosition = pendingSelectionRef.current;
+
       inputRef.current.setSelectionRange(caretPosition, caretPosition);
+
       pendingSelectionRef.current = null;
     });
   }, []);
@@ -136,9 +184,16 @@ const TimecodeInput = ({
   const handleKeyDown = useCallback((event) => {
     if (!inputRef.current) return;
 
-    const { selectionStart = 0, selectionEnd = 0 } = inputRef.current;
+    const {
+      selectionStart = 0,
+      selectionEnd = 0,
+    } = inputRef.current;
 
-    if ((event.ctrlKey || event.metaKey) && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    // Permite atalhos globais do preview
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+    ) {
       return;
     }
 
@@ -146,71 +201,137 @@ const TimecodeInput = ({
       return;
     }
 
+    // Digitação numérica
     if (/^\d$/.test(event.key)) {
       event.preventDefault();
-      handleDigitInput(event.key, selectionStart, selectionEnd);
+
+      handleDigitInput(
+        event.key,
+        selectionStart,
+        selectionEnd
+      );
+
       return;
     }
 
+    // Backspace
     if (event.key === 'Backspace') {
       event.preventDefault();
-      handleBackspace(selectionStart, selectionEnd);
+
+      handleBackspace(
+        selectionStart,
+        selectionEnd
+      );
+
       return;
     }
 
+    // Delete
     if (event.key === 'Delete') {
       event.preventDefault();
-      handleDelete(selectionStart, selectionEnd);
+
+      handleDelete(
+        selectionStart,
+        selectionEnd
+      );
+
       return;
     }
 
+    // Navegação esquerda
     if (event.key === 'ArrowLeft') {
       event.preventDefault();
-      const currentDigit = countEditableBeforeCaret(selectionStart);
+
+      const currentDigit =
+        countEditableBeforeCaret(selectionStart);
+
       moveCaret(Math.max(0, currentDigit - 1));
+
       return;
     }
 
+    // Navegação direita
     if (event.key === 'ArrowRight') {
       event.preventDefault();
-      const currentDigit = countEditableBeforeCaret(selectionEnd);
-      moveCaret(Math.min(4, currentDigit + (selectionStart === selectionEnd ? 1 : 0)));
+
+      const currentDigit =
+        countEditableBeforeCaret(selectionEnd);
+
+      moveCaret(
+        Math.min(
+          4,
+          currentDigit + (selectionStart === selectionEnd ? 1 : 0)
+        )
+      );
+
       return;
     }
 
+    // Home
     if (event.key === 'Home') {
       event.preventDefault();
       moveCaret(0);
       return;
     }
 
+    // End
     if (event.key === 'End') {
       event.preventDefault();
       moveCaret(4);
     }
-  }, [handleBackspace, handleDelete, handleDigitInput, moveCaret]);
+  }, [
+    handleBackspace,
+    handleDelete,
+    handleDigitInput,
+    moveCaret,
+  ]);
 
   const handlePaste = useCallback((event) => {
     event.preventDefault();
-    const pastedText = event.clipboardData?.getData('text') || '';
-    const normalized = normalizeFixedTimecode(pastedText, displayValue);
+
+    const pastedText =
+      event.clipboardData?.getData('text') || '';
+
+    const normalized = normalizeFixedTimecode(
+      pastedText,
+      displayValue
+    );
+
     onChange(normalized);
+
     pendingSelectionRef.current = digitIndexToCaret(4);
   }, [displayValue, onChange]);
 
   const handleChange = useCallback((event) => {
-    onChange(normalizeFixedTimecode(event.target.value, displayValue));
+    onChange(
+      normalizeFixedTimecode(
+        event.target.value,
+        displayValue
+      )
+    );
   }, [displayValue, onChange]);
 
   const handleBlur = useCallback((event) => {
-    onCommit(normalizeFixedTimecode(event.target.value, DEFAULT_TIMECODE));
+    onCommit(
+      normalizeFixedTimecode(
+        event.target.value,
+        DEFAULT_TIMECODE
+      )
+    );
   }, [onCommit]);
 
   const handleMouseUp = useCallback(() => {
     if (!inputRef.current) return;
 
-    const { selectionStart = 0, selectionEnd = 0 } = inputRef.current;
-    if (selectionStart === selectionEnd && selectionStart === 2) {
+    const {
+      selectionStart = 0,
+      selectionEnd = 0,
+    } = inputRef.current;
+
+    if (
+      selectionStart === selectionEnd &&
+      selectionStart === 2
+    ) {
       moveCaret(2);
     }
   }, [moveCaret]);
@@ -257,8 +378,11 @@ export const isTextEntryElement = (element) => {
     return false;
   }
 
-  const type = String(element.getAttribute('type') || 'text').toLowerCase();
+  const type = String(
+    element.getAttribute('type') || 'text'
+  ).toLowerCase();
+
   return !NON_TEXT_INPUT_TYPES.has(type);
 };
 
-export default TimecodeInput;
+export default TimecodeInput

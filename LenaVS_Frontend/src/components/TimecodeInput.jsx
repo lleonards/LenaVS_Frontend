@@ -29,8 +29,8 @@ const getDigitsFromValue = (value) =>
 const digitsToTimecode = (digits) => {
   const safeDigits = String(digits ?? '')
     .replace(/\D/g, '')
-    .padEnd(4, '0')
-    .slice(0, 4);
+    .padStart(4, '0')
+    .slice(-4);
 
   const minutes = Number(safeDigits.slice(0, 2)) || 0;
   const seconds = Math.min(59, Number(safeDigits.slice(2, 4)) || 0);
@@ -60,31 +60,62 @@ const TimecodeInput = ({
 
     const caretPosition = pendingSelectionRef.current;
 
-    inputRef.current.setSelectionRange(caretPosition, caretPosition);
+    inputRef.current.setSelectionRange(
+      caretPosition,
+      caretPosition
+    );
 
     pendingSelectionRef.current = null;
   }, [displayValue]);
 
   const applyNextValue = useCallback((nextDigits, nextDigitIndex) => {
-    pendingSelectionRef.current = digitIndexToCaret(nextDigitIndex);
+    pendingSelectionRef.current =
+      digitIndexToCaret(nextDigitIndex);
+
     onChange(digitsToTimecode(nextDigits));
   }, [onChange]);
 
   const handleDigitInput = useCallback((digit, selectionStart, selectionEnd) => {
-    const digits = getDigitsFromValue(displayValue).split('');
+    const digits =
+      getDigitsFromValue(displayValue).split('');
 
-    const startDigit = countEditableBeforeCaret(selectionStart);
-    const endDigit = countEditableBeforeCaret(selectionEnd);
+    const startDigit =
+      countEditableBeforeCaret(selectionStart);
+
+    const endDigit =
+      countEditableBeforeCaret(selectionEnd);
+
+    // DIGITAÇÃO RÁPIDA NO FINAL
+    if (
+      selectionStart === selectionEnd &&
+      selectionStart >= 5
+    ) {
+      const shifted = [
+        digits[1],
+        digits[2],
+        digits[3],
+        digit,
+      ];
+
+      applyNextValue(shifted.join(''), 4);
+      return;
+    }
 
     const targetDigit = Math.min(startDigit, 3);
 
-    // Impede segundos acima de 59
     if (targetDigit === 2 && Number(digit) > 5) {
       return;
     }
 
-    for (let index = targetDigit; index < endDigit; index += 1) {
-      digits[index] = '0';
+    // Se houver seleção
+    if (startDigit !== endDigit) {
+      for (
+        let index = startDigit;
+        index < endDigit;
+        index += 1
+      ) {
+        digits[index] = '0';
+      }
     }
 
     digits[targetDigit] = digit;
@@ -96,86 +127,108 @@ const TimecodeInput = ({
   }, [applyNextValue, displayValue]);
 
   const handleBackspace = useCallback((selectionStart, selectionEnd) => {
-    const digits = getDigitsFromValue(displayValue).split('');
+    const digits =
+      getDigitsFromValue(displayValue).split('');
 
-    const startDigit = countEditableBeforeCaret(selectionStart);
-    const endDigit = countEditableBeforeCaret(selectionEnd);
+    const startDigit =
+      countEditableBeforeCaret(selectionStart);
 
-    // Quando houver seleção
+    const endDigit =
+      countEditableBeforeCaret(selectionEnd);
+
+    // APAGAR SELEÇÃO
     if (startDigit !== endDigit) {
-      for (let index = startDigit; index < endDigit; index += 1) {
-        digits[index] = '';
+      for (
+        let index = startDigit;
+        index < endDigit;
+        index += 1
+      ) {
+        digits[index] = '0';
       }
 
       applyNextValue(
-        digits.join('').padEnd(4, '0'),
+        digits.join(''),
         startDigit
       );
 
       return;
     }
 
-    // Não deixa apagar antes do primeiro dígito
     if (startDigit <= 0) {
       return;
     }
 
-    // Backspace apaga o número anterior
+    // APAGA O NÚMERO À ESQUERDA DO CURSOR
     const targetDigit = startDigit - 1;
 
-    digits[targetDigit] = '';
+    digits[targetDigit] = '0';
 
     applyNextValue(
-      digits.join('').padEnd(4, '0'),
+      digits.join(''),
       targetDigit
     );
   }, [applyNextValue, displayValue]);
 
   const handleDelete = useCallback((selectionStart, selectionEnd) => {
-    const digits = getDigitsFromValue(displayValue).split('');
+    const digits =
+      getDigitsFromValue(displayValue).split('');
 
-    const startDigit = countEditableBeforeCaret(selectionStart);
-    const endDigit = countEditableBeforeCaret(selectionEnd);
+    const startDigit =
+      countEditableBeforeCaret(selectionStart);
 
-    // Quando houver seleção
+    const endDigit =
+      countEditableBeforeCaret(selectionEnd);
+
+    // APAGAR SELEÇÃO
     if (startDigit !== endDigit) {
-      for (let index = startDigit; index < endDigit; index += 1) {
-        digits[index] = '';
+      for (
+        let index = startDigit;
+        index < endDigit;
+        index += 1
+      ) {
+        digits[index] = '0';
       }
 
       applyNextValue(
-        digits.join('').padEnd(4, '0'),
+        digits.join(''),
         startDigit
       );
 
       return;
     }
 
-    // Não deixa apagar depois do último dígito
     if (startDigit >= 4) {
       return;
     }
 
-    // Delete apaga o número atual
-    digits[startDigit] = '';
+    // DELETE APAGA O NÚMERO À DIREITA
+    digits[startDigit] = '0';
 
     applyNextValue(
-      digits.join('').padEnd(4, '0'),
+      digits.join(''),
       startDigit
     );
   }, [applyNextValue, displayValue]);
 
   const moveCaret = useCallback((nextDigitIndex) => {
-    pendingSelectionRef.current = digitIndexToCaret(nextDigitIndex);
+    pendingSelectionRef.current =
+      digitIndexToCaret(nextDigitIndex);
 
     requestAnimationFrame(() => {
-      if (!inputRef.current || pendingSelectionRef.current === null) {
+      if (
+        !inputRef.current ||
+        pendingSelectionRef.current === null
+      ) {
         return;
       }
 
-      const caretPosition = pendingSelectionRef.current;
+      const caretPosition =
+        pendingSelectionRef.current;
 
-      inputRef.current.setSelectionRange(caretPosition, caretPosition);
+      inputRef.current.setSelectionRange(
+        caretPosition,
+        caretPosition
+      );
 
       pendingSelectionRef.current = null;
     });
@@ -189,19 +242,23 @@ const TimecodeInput = ({
       selectionEnd = 0,
     } = inputRef.current;
 
-    // Permite atalhos globais do preview
     if (
       (event.ctrlKey || event.metaKey) &&
-      (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+      (event.key === 'ArrowLeft' ||
+        event.key === 'ArrowRight')
     ) {
       return;
     }
 
-    if (event.ctrlKey || event.metaKey || event.altKey) {
+    if (
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    ) {
       return;
     }
 
-    // Digitação numérica
+    // DIGITAÇÃO
     if (/^\d$/.test(event.key)) {
       event.preventDefault();
 
@@ -214,7 +271,7 @@ const TimecodeInput = ({
       return;
     }
 
-    // Backspace
+    // BACKSPACE
     if (event.key === 'Backspace') {
       event.preventDefault();
 
@@ -226,7 +283,7 @@ const TimecodeInput = ({
       return;
     }
 
-    // Delete
+    // DELETE
     if (event.key === 'Delete') {
       event.preventDefault();
 
@@ -238,19 +295,21 @@ const TimecodeInput = ({
       return;
     }
 
-    // Navegação esquerda
+    // SETA ESQUERDA
     if (event.key === 'ArrowLeft') {
       event.preventDefault();
 
       const currentDigit =
         countEditableBeforeCaret(selectionStart);
 
-      moveCaret(Math.max(0, currentDigit - 1));
+      moveCaret(
+        Math.max(0, currentDigit - 1)
+      );
 
       return;
     }
 
-    // Navegação direita
+    // SETA DIREITA
     if (event.key === 'ArrowRight') {
       event.preventDefault();
 
@@ -260,21 +319,22 @@ const TimecodeInput = ({
       moveCaret(
         Math.min(
           4,
-          currentDigit + (selectionStart === selectionEnd ? 1 : 0)
+          currentDigit +
+            (selectionStart === selectionEnd ? 1 : 0)
         )
       );
 
       return;
     }
 
-    // Home
+    // HOME
     if (event.key === 'Home') {
       event.preventDefault();
       moveCaret(0);
       return;
     }
 
-    // End
+    // END
     if (event.key === 'End') {
       event.preventDefault();
       moveCaret(4);
@@ -292,14 +352,16 @@ const TimecodeInput = ({
     const pastedText =
       event.clipboardData?.getData('text') || '';
 
-    const normalized = normalizeFixedTimecode(
-      pastedText,
-      displayValue
-    );
+    const normalized =
+      normalizeFixedTimecode(
+        pastedText,
+        displayValue
+      );
 
     onChange(normalized);
 
-    pendingSelectionRef.current = digitIndexToCaret(4);
+    pendingSelectionRef.current =
+      digitIndexToCaret(4);
   }, [displayValue, onChange]);
 
   const handleChange = useCallback((event) => {
@@ -328,6 +390,7 @@ const TimecodeInput = ({
       selectionEnd = 0,
     } = inputRef.current;
 
+    // EVITA CURSOR NO :
     if (
       selectionStart === selectionEnd &&
       selectionStart === 2
@@ -370,7 +433,10 @@ export const isTextEntryElement = (element) => {
 
   const tagName = element.tagName;
 
-  if (tagName === 'TEXTAREA' || tagName === 'SELECT') {
+  if (
+    tagName === 'TEXTAREA' ||
+    tagName === 'SELECT'
+  ) {
     return true;
   }
 
@@ -385,4 +451,4 @@ export const isTextEntryElement = (element) => {
   return !NON_TEXT_INPUT_TYPES.has(type);
 };
 
-export default TimecodeInput
+export default TimecodeInput;

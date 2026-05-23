@@ -37,8 +37,7 @@ const NotFound = () => {
 
         <h1 style={{ margin: 0, fontSize: '36px', lineHeight: 1.1 }}>Página não encontrada</h1>
         <p style={{ margin: '14px 0 0', color: '#c9c9c9', lineHeight: 1.7 }}>
-          Em vez de cair em uma tela branca com “Not Found”, agora o LenaVS mostra uma rota segura.
-          Você pode voltar para a área principal sem perder a navegação.
+        
         </p>
 
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 28 }}>

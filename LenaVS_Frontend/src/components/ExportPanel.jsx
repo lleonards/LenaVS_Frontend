@@ -296,7 +296,7 @@ const ExportPanel = ({
 
       alert(
         hasUnlimitedAccess
-          ? 'Vídeo gerado e baixado com sucesso! Seu plano ilimitado permaneceu ativo.'
+          ? 'Vídeo gerado e baixado com sucesso!'
           : 'Vídeo gerado e baixado com sucesso! 1 crédito foi consumido neste download.'
       );
     } catch (error) {

@@ -610,7 +610,7 @@ const FilesPanel = ({
           <div className="files-animation-popover__header">
             <div>
               <span className="files-animation-popover__eyebrow">Comportamento</span>
-              <strong>Comportamento</strong>
+              <strong>Modo de Exibição</strong>
               <p>Ajuste entrada, saída e loop sem corte visual</p>
             </div>
 

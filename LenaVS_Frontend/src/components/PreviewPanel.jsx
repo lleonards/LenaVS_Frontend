@@ -589,7 +589,7 @@ const PreviewPanel = forwardRef(({
       <div className="preview-panel-header">
         <h2>Preview</h2>
         <span className="preview-tip">
-          Preview em canvas 16:9 fixo para bater com a exportação final.
+          Preview fixo no formato 16:9 fixo.
         </span>
       </div>
 

@@ -589,7 +589,7 @@ const PreviewPanel = forwardRef(({
       <div className="preview-panel-header">
         <h2>Preview</h2>
         <span className="preview-tip">
-          Preview fixo no formato 16:9 fixo.
+          Preview fixo no formato 16:9.
         </span>
       </div>
 

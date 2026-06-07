@@ -53,12 +53,12 @@ const GUIDE_PANELS = [
     bubbleText:
       `Arquivos
 Neste painel você adiciona todos os arquivos necessários para criar seu vídeo.
-Envie a música original e a música instrumental (até 15 minutos cada).
-Adicione uma imagem ou vídeo de fundo opcional para personalizar o resultado final.
-Se o vídeo for maior que o áudio, ele será ajustado para acompanhar a duração da música.
-Se o vídeo for menor que o áudio, ele será repetido automaticamente durante a reprodução.
-Pelo botão Comportamento, você pode configurar efeitos suaves de entrada, saída e repetição do vídeo para evitar cortes bruscos.
-Você também pode adicionar a letra enviando um arquivo ou simplesmente colando o texto.
+Envie a música original e a música instrumental (até 15 minutos cada),
+adicione uma imagem ou vídeo de fundo opcional para personalizar o resultado final
+Se o vídeo for maior que o áudio, ele será ajustado para acompanhar a duração da música,
+se o vídeo for menor que o áudio, ele será repetido automaticamente durante a reprodução
+pelo botão Comportamento, você pode configurar efeitos suaves de entrada, saída e repetição do vídeo para evitar cortes bruscos.
+Você também pode adicionar a letra enviando um arquivo ou simplesmente colando o texto,
 Caso a letra não esteja organizada em estrofes, a LenaVS faz a separação automaticamente para facilitar a edição.`,
   },
   {

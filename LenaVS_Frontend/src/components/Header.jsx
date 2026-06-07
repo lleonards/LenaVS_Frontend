@@ -58,13 +58,9 @@ const GUIDE_PANELS = [
     bubbleTone: 'peach',
     bubbleText:
       `Arquivos
-Neste painel você adiciona todos os arquivos necessários para criar seu vídeo. Envie a música original e a música instrumental 
-(até 15 minutos cada). Adicione uma imagem ou vídeo de fundo opcional para personalizar o resultado final.
-Se o vídeo for maior que o áudio, ele será ajustado para acompanhar a duração da música. Se o vídeo for menor que o áudio, 
-ele será repetido automaticamente durante a reprodução. Pelo botão Comportamento, 
-você pode configurar efeitos suaves de entrada, saída e repetição do vídeo para evitar cortes bruscos. Você também pode adicionar 
-a letra enviando um arquivo ou simplesmente colando o texto.
-Caso a letra não esteja organizada em estrofes, a LenaVS faz a separação automaticamente para facilitar a edição.`,
+Neste painel você adiciona todos os arquivos necessários para criar seu vídeo. Envie a música original e a música instrumental (até 15 minutos cada). Adicione uma imagem ou vídeo de fundo opcional para personalizar o resultado final.
+Se o vídeo for maior que o áudio, ele será ajustado para acompanhar a duração da música. Se o vídeo for menor que o áudio, ele será repetido automaticamente durante a reprodução. Pelo botão Comportamento, 
+você pode configurar efeitos suaves de entrada, saída e repetição do vídeo para evitar cortes bruscos. Você também pode adicionar a letra enviando um arquivo ou simplesmente colando o texto.Caso a letra não esteja organizada em estrofes, a LenaVS faz a separação automaticamente para facilitar a edição.`,
   },
   {
     id: 'preview',
@@ -148,10 +144,8 @@ N para marcar o fim e as teclas ↑ e ↓ para navegar entre as estrofes.`,
     bubbleTone: 'peach',
     bubbleText:
       `Comportamento
-O botão Comportamento é exibido quando um vídeo ou imagem é adicionado ao projeto. Nele, você pode configurar transições para tornar a exibição mais suave. 
-Quando o vídeo é maior que o áudio, ele é ajustado automaticamente para a mesma duração da música, permitindo configurar apenas as transições de início e fim. 
-Se o vídeo for menor que o áudio, ele será repetido automaticamente, e você poderá definir transições de início, fim e entre os loops. Para imagens, 
-ficam disponíveis apenas as transições de início e fim.`,
+O botão Comportamento é exibido quando um vídeo ou imagem é adicionado ao projeto. Nele, você pode configurar transições para tornar a exibição mais suave. Quando o vídeo é maior que o áudio, ele é ajustado automaticamente para a mesma duração da música, permitindo configurar apenas as transições de início e fim. 
+Se o vídeo for menor que o áudio, ele será repetido automaticamente, e você poderá definir transições de início, fim e entre os loops. Para imagens, ficam disponíveis apenas as transições de início e fim.`,
   },
   {
     id: 'exportar',
@@ -174,10 +168,8 @@ ficam disponíveis apenas as transições de início e fim.`,
     bubbleTone: 'gold',
     bubbleText:
       `Exportar Vídeo
-Neste painel você define as configurações finais do vídeo antes da exportação. Para liberar o download, é necessário informar um nome para o projeto. 
-Você pode escolher a resolução do vídeo (atualmente até 720p), selecionar o formato de saída (MP4, AVI, MOV ou MKV)
-e definir qual áudio será utilizado no resultado final, entre a música original ou o playback. Após a conclusão da exportação, 
-você pode baixar o vídeo gerado ou iniciar um novo projeto pelo botão Novo Projeto.`,
+Neste painel você define as configurações finais do vídeo antes da exportação. Para liberar o download, é necessário informar um nome para o projeto. Você pode escolher a resolução do vídeo (atualmente até 720p), selecionar o formato de saída (MP4, AVI, MOV ou MKV)
+e definir qual áudio será utilizado no resultado final, entre a música original ou o playback. Após a conclusão da exportação, você pode baixar o vídeo gerado ou iniciar um novo projeto pelo botão Novo Projeto.`,
   },
 ];
 

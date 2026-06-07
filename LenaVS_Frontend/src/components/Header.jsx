@@ -57,9 +57,15 @@ const GUIDE_PANELS = [
     },
     bubbleTone: 'peach',
     bubbleText:
-      `Painel Arquivos
-Comece por aqui para enviar a música original, o playback e a letra.
-Se quiser, você também pode adicionar uma imagem ou vídeo de fundo para montar o visual do karaokê.`,
+      `Arquivos
+Neste painel você adiciona todos os arquivos necessários para criar seu vídeo.
+Envie a música original e a música instrumental (até 15 minutos cada).
+Adicione uma imagem ou vídeo de fundo opcional para personalizar o resultado final.
+Se o vídeo for maior que o áudio, ele será ajustado para acompanhar a duração da música.
+Se o vídeo for menor que o áudio, ele será repetido automaticamente durante a reprodução.
+Pelo botão Comportamento, você pode configurar efeitos suaves de entrada, saída e repetição do vídeo para evitar cortes bruscos.
+Você também pode adicionar a letra enviando um arquivo ou simplesmente colando o texto.
+Caso a letra não esteja organizada em estrofes, a LenaVS faz a separação automaticamente para facilitar a edição.`,
   },
   {
     id: 'preview',
@@ -80,10 +86,16 @@ Se quiser, você também pode adicionar uma imagem ou vídeo de fundo para monta
       width: '31%',
     },
     bubbleTone: 'green',
-    bubbleText:
-      `Preview
-Aqui você acompanha como o vídeo está ficando antes de exportar.
-Use os controles para tocar a música, conferir o tempo da letra e alternar entre original e playback.`,
+  bubbleText:
+  `Preview
+Neste painel você acompanha, em tempo real, como o vídeo de karaokê está ficando durante a edição.
+É possível reproduzir, pausar e continuar a reprodução do projeto, 
+navegar pela linha do tempo e alternar entre a música original e a instrumental usando a tecla T.
+Para uma edição mais rápida, utilize a tecla Espaço para reproduzir ou 
+pausar o vídeo e Ctrl + ← / → para voltar ou avançar 1 segundo.
+Também é possível alterar a cor de fundo do vídeo diretamente pelo painel.
+Quando uma estrofe possui os tempos inicial e final definidos no Editor de Letras, 
+o Preview retorna automaticamente para o tempo inicial da estrofe ao selecioná-la.`,
   },
   {
     id: 'editor',
@@ -106,8 +118,15 @@ Use os controles para tocar a música, conferir o tempo da letra e alternar entr
     bubbleTone: 'blue',
     bubbleText:
       `Editor de Letras
-É aqui que você ajusta cada bloco da letra, marca o começo e o fim de cada trecho e muda o visual do texto.
-Assim fica mais fácil deixar o karaokê sincronizado e com a aparência que você quer.`,
+Neste painel você edita e sincroniza as estrofes da música. 
+Cada estrofe fica organizada em um bloco individual, 
+onde é possível definir os tempos de início e fim, 
+ajustar o tamanho do texto e personalizar sua aparência. 
+Você pode aplicar negrito, itálico, sublinhado, alterar cores, 
+contorno e posicionamento da letra. Também é possível adicionar transições como Fade, 
+Slide, Zoom In e Zoom Out, ajustar sua duração e remover blocos de estrofes quando necessário. 
+Para agilizar a edição, utilize M para marcar o início da estrofe, 
+N para marcar o fim e as teclas ↑ e ↓ para navegar entre as estrofes.`,
   },
   {
     id: 'comportamento',
@@ -129,9 +148,14 @@ Assim fica mais fácil deixar o karaokê sincronizado e com a aparência que voc
     },
     bubbleTone: 'peach',
     bubbleText:
-      `Painel Comportamento
-Esse painel controla como o fundo aparece, desaparece e se repete durante o vídeo.
-Use para deixar a entrada, a saída e o loop mais suaves, sem sensação de corte brusco.`,
+      `Comportamento
+O botão Comportamento é exibido quando um vídeo ou imagem é adicionado ao projeto. 
+Nele, você pode configurar transições para tornar a exibição mais suave. 
+Quando o vídeo é maior que o áudio, ele é ajustado automaticamente para a mesma duração da música, 
+permitindo configurar apenas as transições de início e fim. 
+Se o vídeo for menor que o áudio, ele será repetido automaticamente, 
+e você poderá definir transições de início, fim e entre os loops. Para imagens, 
+ficam disponíveis apenas as transições de início e fim.`,
   },
   {
     id: 'exportar',
@@ -153,9 +177,14 @@ Use para deixar a entrada, a saída e o loop mais suaves, sem sensação de cort
     },
     bubbleTone: 'gold',
     bubbleText:
-      `Painel Exportar Vídeo
-Quando estiver tudo pronto, escolha o nome do projeto, a resolução, o formato e o áudio final.
-Depois é só exportar para gerar o vídeo completo.`,
+      `Exportar Vídeo
+Neste painel você define as configurações finais do vídeo antes da exportação. 
+Para liberar o download, é necessário informar um nome para o projeto. 
+Você pode escolher a resolução do vídeo (atualmente até 720p), 
+selecionar o formato de saída (MP4, AVI, MOV ou MKV)
+e definir qual áudio será utilizado no resultado final, 
+entre a música original ou o playback. Após a conclusão da exportação, 
+você pode baixar o vídeo gerado ou iniciar um novo projeto pelo botão Novo Projeto.`,
   },
 ];
 

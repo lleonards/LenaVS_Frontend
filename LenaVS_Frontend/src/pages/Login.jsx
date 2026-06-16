@@ -114,7 +114,7 @@ const Login = () => {
         <div className="legal-inline-note" role="note">
           <ShieldCheck size={16} />
           <span>
-            Ao acessar a plataforma, você pode consultar nossa{' '}
+            {' '}
             <Link to="/privacy-policy" className="legal-inline-link">
               Política de Privacidade
             </Link>

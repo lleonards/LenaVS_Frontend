@@ -3,12 +3,10 @@ export const privacyPolicyMeta = {
   lastUpdated: 'Junho de 2026',
   version: '2026-06',
 };
-
 export const privacyPolicyIntro = [
   'A LenaVS respeita a sua privacidade e está comprometida em proteger os dados pessoais coletados durante a utilização da plataforma.',
   'Esta Política de Privacidade explica quais informações coletamos, como elas são utilizadas e quais são os seus direitos em relação a esses dados.',
 ];
-
 export const privacyPolicySections = [
   {
     id: 'informacoes-coletadas',
@@ -146,21 +144,21 @@ export const privacyPolicySections = [
       },
       {
         type: 'paragraph',
-        text: 'As solicitações poderão ser realizadas através do suporte da LenaVS ou pelos recursos disponibilizados na própria plataforma.',
+        text: 'As solicitações poderão ser realizadas através do suporte da LenaVS.',
       },
     ],
   },
   {
     id: 'exclusao-conta',
-    title: '7. Exclusão de conta e conteúdos públicos',
+    title: '7. Exclusão de conta e dados associados',
     blocks: [
       {
         type: 'paragraph',
-        text: 'Ao solicitar a exclusão da conta, os dados pessoais associados ao usuário poderão ser removidos ou anonimizados, conforme aplicável.',
+        text: 'Ao solicitar a exclusão da conta, todos os dados pessoais associados ao usuário serão permanentemente removidos da plataforma, incluindo projetos, histórico de atividades e demais informações vinculadas à conta.',
       },
       {
         type: 'paragraph',
-        text: 'Projetos que tenham sido publicados voluntariamente em áreas públicas da plataforma poderão permanecer disponíveis para outros usuários, desde que não contenham dados pessoais identificáveis. Nesses casos, a associação entre o projeto público e a conta excluída poderá ser removida ou anonimizada.',
+        text: 'Registros financeiros relacionados a transações realizadas poderão ser mantidos de forma anonimizada para fins de auditoria e cumprimento de obrigações legais, sem qualquer vinculação identificável ao usuário excluído.',
       },
     ],
   },

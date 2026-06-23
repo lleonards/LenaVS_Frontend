@@ -171,9 +171,10 @@ Neste painel você edita e sincroniza as estrofes da música.
 Cada estrofe fica organizada em um bloco individual, 
 onde é possível definir os tempos de início e fim, 
 ajustar o tamanho do texto e personalizar sua aparência. 
-Você pode aplicar negrito, itálico, sublinhado, alterar cores, 
-contorno e posicionamento da letra. Também é possível adicionar transições como Fade, 
-Slide, Zoom In e Zoom Out, ajustar sua duração e remover blocos de estrofes quando necessário. 
+Você pode aplicar negrito, itálico, sublinhado, alterar cores, contorno e posicionamento da letra. 
+No Modo Linha, também é possível personalizar individualmente cada frase ou linha da estrofe. 
+Também é possível adicionar transições como Fade, Slide, Zoom In e Zoom Out,
+ajustar sua duração e remover blocos de estrofes quando necessário. 
 Para agilizar a edição, utilize M para marcar o início da estrofe, 
 N para marcar o fim e as teclas ↑ e ↓ para navegar entre as estrofes.`,
   },

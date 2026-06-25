@@ -839,7 +839,6 @@ const FilesPanel = ({
   {isCreatingInstrumental
     ? 'Separando voz e instrumental com IA... isso pode levar alguns minutos.'
     : mediaFiles?.musicaInstrumental
-      ? 'Instrumental gerado com sucesso.'
       : !mediaFiles?.musicaOriginal
         ? 'Faça upload da música original para habilitar.'
         : 'Gera a versão sem voz com IA.'}

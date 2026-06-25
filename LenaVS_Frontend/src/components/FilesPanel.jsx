@@ -835,13 +835,12 @@ const FilesPanel = ({
           </button>
         </div>
 
-       <p className="auto-sync-hint">
+   <p className="auto-sync-hint">
   {isCreatingInstrumental
     ? 'Separando voz e instrumental com IA... isso pode levar alguns minutos.'
-    : mediaFiles?.musicaInstrumental
-      : !mediaFiles?.musicaOriginal
-        ? 'Faça upload da música original para habilitar.'
-        : 'Gera a versão sem voz com IA.'}
+    : !mediaFiles?.musicaOriginal
+      ? 'Faça upload da música original para habilitar.'
+      : 'Gera a versão sem voz com IA.'}
 </p>
       </div>
 

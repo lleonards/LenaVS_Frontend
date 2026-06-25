@@ -476,7 +476,7 @@ const FilesPanel = ({
       onNotify?.({
         type: 'info',
         title: 'Criando instrumental…',
-        message: 'Separando voz e instrumental com Demucs no servidor. Isso pode levar de 1 a 4 minutos, dependendo do tamanho da música.',
+        message: 'Separando voz e instrumental com IA. Esta ação pode levar alguns instantes',
       });
 
       const response = await api.post('/media/instrumental', {
@@ -812,7 +812,7 @@ const FilesPanel = ({
             title={
               !mediaFiles?.musicaOriginal
                 ? 'Faça o upload da música original primeiro'
-                : 'Remover vocais da música original e gerar instrumental com Demucs'
+                : 'Remover vocais da música original e gerar instrumental com IA'
             }
           >
             {isCreatingInstrumental ? (
@@ -827,7 +827,7 @@ const FilesPanel = ({
               <span className="auto-sync-btn-content">
                 <span className="auto-sync-btn-main">
                   <Music2 size={15} />
-                  <span>Criar Instrumental com Demucs</span>
+                  <span>Criar Instrumental com IA</span>
                 </span>
                 <span className="auto-sync-btn-note">Isso pode levar alguns minutos</span>
               </span>
@@ -837,12 +837,12 @@ const FilesPanel = ({
 
         <p className="auto-sync-hint">
           {isCreatingInstrumental
-            ? 'Separando voz e instrumental com Demucs… isso pode levar alguns minutos.'
+            ? 'Separando voz e instrumental com IA… isso pode levar alguns minutos.'
             : mediaFiles?.musicaInstrumental
-              ? '✓ Instrumental disponível. Você pode gerar novamente se quiser.'
+              ? 
               : !mediaFiles?.musicaOriginal
                 ? 'Faça upload da música original para habilitar.'
-                : 'Gera a versão sem voz com Demucs a partir da música original e faz upload automático.'}
+                : 'Gera a versão sem voz com IA.'}
         </p>
       </div>
 

@@ -542,7 +542,7 @@ const Editor = () => {
         setMyProjects((prev) => [forkedProject, ...prev.filter((item) => item.id !== forkedProject.id)]);
         loadProjectIntoEditor(
           forkedProject,
-          `Uma cópia de "${project.name}" foi criada para você. Agora você pode editar nome, fonte e cores sem interferir no original.`
+          `Uma cópia de "${project.name}" Cópia independente foi criada.`
         );
       });
     } catch (error) {

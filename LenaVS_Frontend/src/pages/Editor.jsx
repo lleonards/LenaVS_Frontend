@@ -542,7 +542,7 @@ const Editor = () => {
         setMyProjects((prev) => [forkedProject, ...prev.filter((item) => item.id !== forkedProject.id)]);
         loadProjectIntoEditor(
           forkedProject,
-          `Uma cópia de "${project.name}" Cópia independente foi criada.`
+          `Uma cópia"${project.name}"foi gerada para edição.`
         );
       });
     } catch (error) {

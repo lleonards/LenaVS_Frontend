@@ -290,8 +290,8 @@ const ExportPanel = ({
         type: 'warning',
         title: isExpired ? 'Prazo de pagamento expirado' : 'Créditos esgotados',
         message: isExpired
-          ? 'O prazo do seu plano expirou. Efetue o pagamento para continuar usando a plataforma.'
-          : 'Você está sem créditos. Obtenha o plano ilimitado para continuar exportando.',
+          ? 'O prazo do seu plano expirou. Efetue o pagamento para continuar.'
+          : 'Você está sem créditos. Obtenha o plano ilimitado para continuar.',
       });
       await openCheckout();
       return;
@@ -545,7 +545,7 @@ const ExportPanel = ({
       <ConfirmDialog
         isOpen={showNewProjectDialog}
         title="Criar novo projeto?"
-        message="O projeto atual será descartado do editor. Certifique-se de ter exportado ou salvo o que precisava antes de continuar."
+        message="Ao criar um novo projeto, o atual será descartado. Deseja continuar?"
         confirmLabel="Criar novo projeto"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmNewProject}

@@ -84,7 +84,7 @@ const GuideProjectsNote = () => (
   </div>
 );
 
-const SUPPORT_HREF = 'mailto:noreply@lenavs.com?subject=Suporte%20LenaVS';
+const SUPPORT_HREF = 'mailto:suporte@lenavs.com?subject=Suporte%20LenaVS';
 
 const GUIDE_PANELS = [
   {

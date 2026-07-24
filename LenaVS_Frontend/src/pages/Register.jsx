@@ -92,7 +92,7 @@ const Register = () => {
         </div>
 
         <h1 className="register-title">Criar Conta</h1>
-        <p className="register-subtitle">Escolha seu país para o checkout abrir com a moeda correta.</p>
+        <p className="register-subtitle">Escolha seu país.</p>
 
         {successMessage && (
           <div className="success-message register-full-width">{successMessage}</div>
@@ -127,7 +127,7 @@ const Register = () => {
           </div>
 
           <div className="form-group register-full-width register-country-group">
-            <label htmlFor="countryGroup">País para cobrança</label>
+            <label htmlFor="countryGroup">País</label>
             <select
               id="countryGroup"
               value={countryGroup}
@@ -141,7 +141,8 @@ const Register = () => {
               ))}
             </select>
             <span className="register-helper-text">
-              Brasil abre checkout em reais. Qualquer outro país abre checkout em dólar.
+
+              
             </span>
           </div>
 

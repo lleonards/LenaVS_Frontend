@@ -52,7 +52,7 @@ const Login = () => {
 
         <p className="seo-description">
           Crie vídeos de karaokê facilmente com o LenaVS.
-          Sincronize letras, personalize o visual e exporte em poucos cliques.
+          Sincronize letras, personalize o visual e exporte com alguns cliques.
         </p>
 
         <h1 style={{ display: 'none' }}>

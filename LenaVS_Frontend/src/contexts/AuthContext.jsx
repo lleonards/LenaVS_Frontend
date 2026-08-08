@@ -716,7 +716,7 @@ export const AuthProvider = ({ children }) => {
           },
 
           emailRedirectTo: typeof window !== 'undefined'
-  ? ${window.location.origin}/
+  ? ${window.location.origin}/'
   : undefined,
         },
       });

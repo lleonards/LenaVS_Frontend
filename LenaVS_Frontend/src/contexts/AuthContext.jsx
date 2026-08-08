@@ -55,6 +55,15 @@ const redirectToEditorAfterAuthCallback = () => {
   url.hash = '/editor';
   window.location.replace(url.toString());
 };
+const getEmailRedirectUrl = () => {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.hash = '';
+  return url.toString();
+};
 const withTimeout = async (
   promise,
   timeoutMs,
@@ -113,14 +122,217 @@ const deriveProfileFromSessionUser = (sessionUser) => {
     email: sessionUser?.email || null,
   };
 };
-const getEmailRedirectUrl = () => {
-  if (typeof window === 'undefined') {
-    return undefined;
-  }
-  const url = new URL(window.location.href);
-  url.search = '';
-  url.hash = '';
-  return url.toString();
+const EmailConfirmationNotice = ({
+  email,
+  onClose,
+}) => {
+  return (
+    <div
+      role="presentation"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        background: 'rgba(15, 23, 42, 0.58)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="email-confirmation-title"
+        aria-describedby="email-confirmation-description"
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: '460px',
+          overflow: 'hidden',
+          borderRadius: '24px',
+          background: '#ffffff',
+          boxShadow:
+            '0 24px 80px rgba(15, 23, 42, 0.28)',
+          fontFamily:
+            'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
+        <div
+          style={{
+            height: '7px',
+            width: '100%',
+            background:
+              'linear-gradient(90deg, #7c3aed 0%, #a855f7 48%, #ec4899 100%)',
+          }}
+        />
+        <div
+          style={{
+            padding: '34px 32px 30px',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: '72px',
+              height: '72px',
+              margin: '0 auto 22px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              background:
+                'linear-gradient(135deg, #ede9fe 0%, #fce7f3 100%)',
+              color: '#7c3aed',
+            }}
+          >
+            <svg
+              width="35"
+              height="35"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5h-6.379a2.5 2.5 0 0 0-1.768.732L7.5 18.586V16H6.5A2.5 2.5 0 0 1 4 13.5v-7Z"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="m7.5 8.5 4.5 3 4.5-3"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h2
+            id="email-confirmation-title"
+            style={{
+              margin: '0 0 12px',
+              color: '#171327',
+              fontSize: '25px',
+              fontWeight: 750,
+              lineHeight: 1.2,
+              letterSpacing: '-0.025em',
+            }}
+          >
+            Confirme seu e-mail
+          </h2>
+          <p
+            id="email-confirmation-description"
+            style={{
+              margin: '0 auto',
+              maxWidth: '360px',
+              color: '#625d72',
+              fontSize: '15px',
+              lineHeight: 1.65,
+            }}
+          >
+            Enviamos um link de confirmação para
+            <strong
+              style={{
+                display: 'block',
+                marginTop: '5px',
+                color: '#332b4d',
+                fontWeight: 700,
+                overflowWrap: 'anywhere',
+              }}
+            >
+              {email || 'seu endereço de e-mail'}
+            </strong>
+          </p>
+          <div
+            style={{
+              display: 'flex',
+              gap: '11px',
+              alignItems: 'flex-start',
+              margin: '24px 0 26px',
+              padding: '14px 16px',
+              borderRadius: '14px',
+              background: '#faf7ff',
+              border: '1px solid #eee7ff',
+              textAlign: 'left',
+            }}
+          >
+            <span
+              aria-hidden="true"
+              style={{
+                flexShrink: 0,
+                marginTop: '1px',
+                color: '#8b5cf6',
+                fontSize: '17px',
+                lineHeight: 1,
+              }}
+            >
+              ✦
+            </span>
+            <span
+              style={{
+                color: '#655b7d',
+                fontSize: '13px',
+                lineHeight: 1.55,
+              }}
+            >
+              Abra o e-mail e clique no link para ativar
+              sua conta. Depois da confirmação, você será
+              direcionado automaticamente para o editor.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              width: '100%',
+              minHeight: '48px',
+              border: 0,
+              borderRadius: '12px',
+              padding: '12px 18px',
+              background:
+                'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+              color: '#ffffff',
+              cursor: 'pointer',
+              fontSize: '15px',
+              fontWeight: 700,
+              boxShadow:
+                '0 8px 20px rgba(124, 58, 237, 0.22)',
+              transition:
+                'transform 160ms ease, box-shadow 160ms ease',
+            }}
+            onMouseEnter={(event) => {
+              event.currentTarget.style.transform =
+                'translateY(-1px)';
+              event.currentTarget.style.boxShadow =
+                '0 11px 24px rgba(124, 58, 237, 0.3)';
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.transform =
+                'translateY(0)';
+              event.currentTarget.style.boxShadow =
+                '0 8px 20px rgba(124, 58, 237, 0.22)';
+            }}
+          >
+            Entendi
+          </button>
+          <p
+            style={{
+              margin: '16px 0 0',
+              color: '#9891a8',
+              fontSize: '12px',
+              lineHeight: 1.5,
+            }}
+          >
+            Não encontrou? Verifique também a pasta de spam.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -134,6 +346,8 @@ export const AuthProvider = ({ children }) => {
   const [displayName, setDisplayName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
+  const [emailConfirmationNotice, setEmailConfirmationNotice] =
+    useState(null);
   const sessionRef = useRef(null);
   const resetLocalUserState = () => {
     setCredits(0);
@@ -645,9 +859,9 @@ export const AuthProvider = ({ children }) => {
     if (error) {
       throw error;
     }
-    alert(
-      'Verifique seu e-mail para confirmar sua conta. Após clicar no link, você será direcionado automaticamente para o editor.'
-    );
+    setEmailConfirmationNotice({
+      email: normalizedEmail,
+    });
   };
   const signIn = async (
     email,
@@ -665,6 +879,7 @@ export const AuthProvider = ({ children }) => {
     if (error) {
       throw error;
     }
+    setEmailConfirmationNotice(null);
     if (data?.session) {
       sessionRef.current =
         data.session;
@@ -737,6 +952,14 @@ export const AuthProvider = ({ children }) => {
       }}
     >
       {children}
+      {emailConfirmationNotice && (
+        <EmailConfirmationNotice
+          email={emailConfirmationNotice.email}
+          onClose={() => {
+            setEmailConfirmationNotice(null);
+          }}
+        />
+      )}
     </AuthContext.Provider>
   );
 };

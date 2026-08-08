@@ -10,29 +10,50 @@ import { hasSupabaseConfig, supabase } from '../services/supabase';
 import api from '../services/api';
 const AuthContext = createContext(null);
 const AUTH_BOOT_TIMEOUT_MS = 5000;
-const hasSupabaseAuthCallback = () => {
+const getAuthCallbackParams = () => {
   if (typeof window === 'undefined') {
-    return false;
+    return {
+      accessToken: null,
+      refreshToken: null,
+      code: null,
+      tokenHash: null,
+      type: null,
+    };
   }
   const hash = window.location.hash.replace(/^#/, '');
-  const params = new URLSearchParams(hash);
+  const hashParams = new URLSearchParams(hash);
+  const searchParams = new URLSearchParams(
+    window.location.search || ''
+  );
+  return {
+    accessToken: hashParams.get('access_token'),
+    refreshToken: hashParams.get('refresh_token'),
+    code: searchParams.get('code'),
+    tokenHash: searchParams.get('token_hash'),
+    type: searchParams.get('type'),
+  };
+};
+const hasSupabaseAuthCallback = () => {
+  const {
+    accessToken,
+    refreshToken,
+    code,
+    tokenHash,
+  } = getAuthCallbackParams();
   return Boolean(
-    params.get('access_token') &&
-    params.get('refresh_token')
+    (accessToken && refreshToken) ||
+    code ||
+    tokenHash
   );
 };
 const redirectToEditorAfterAuthCallback = () => {
   if (typeof window === 'undefined') {
     return;
   }
-  const pathname = window.location.pathname || '/';
-  const search = window.location.search || '';
-  window.history.replaceState(
-    window.history.state,
-    document.title,
-    `${pathname}${search}#/editor`
-  );
-  window.dispatchEvent(new HashChangeEvent('hashchange'));
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.hash = '/editor';
+  window.location.replace(url.toString());
 };
 const withTimeout = async (
   promise,
@@ -91,6 +112,15 @@ const deriveProfileFromSessionUser = (sessionUser) => {
     avatarUrl,
     email: sessionUser?.email || null,
   };
+};
+const getEmailRedirectUrl = () => {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.hash = '';
+  return url.toString();
 };
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -268,6 +298,153 @@ export const AuthProvider = ({ children }) => {
     const cameFromSupabaseAuthCallback =
       hasSupabaseAuthCallback();
     let callbackRedirectHandled = false;
+    const getCurrentSession = async () => {
+      const { data, error } = await withTimeout(
+        supabase.auth.getSession(),
+        AUTH_BOOT_TIMEOUT_MS,
+        {
+          data: {
+            session: null,
+          },
+          error: new Error(
+            'Timeout ao recuperar a sessão.'
+          ),
+        },
+        'Timeout ao recuperar sessão do Supabase. Liberando a interface para evitar tela infinita de carregamento.'
+      );
+      if (error) {
+        console.error(
+          'Erro ao recuperar sessão:',
+          error.message
+        );
+      }
+      return data?.session ?? null;
+    };
+    const restoreSessionFromCallback = async () => {
+      let currentSession = await getCurrentSession();
+      if (currentSession) {
+        return currentSession;
+      }
+      const {
+        accessToken,
+        refreshToken,
+        code,
+        tokenHash,
+        type,
+      } = getAuthCallbackParams();
+      if (accessToken && refreshToken) {
+        try {
+          const { data, error } = await withTimeout(
+            supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            }),
+            AUTH_BOOT_TIMEOUT_MS,
+            {
+              data: {
+                session: null,
+              },
+              error: new Error(
+                'Timeout ao restaurar a sessão pelo link de confirmação.'
+              ),
+            },
+            'Timeout ao restaurar a sessão recebida pelo link de confirmação.'
+          );
+          if (!error && data?.session) {
+            return data.session;
+          }
+          if (error) {
+            console.warn(
+              'Não foi possível restaurar a sessão pelos tokens do link:',
+              error.message
+            );
+          }
+        } catch (error) {
+          console.warn(
+            'Erro ao restaurar a sessão pelos tokens do link:',
+            error?.message
+          );
+        }
+      }
+      if (code) {
+        try {
+          const { data, error } = await withTimeout(
+            supabase.auth.exchangeCodeForSession(code),
+            AUTH_BOOT_TIMEOUT_MS,
+            {
+              data: {
+                session: null,
+              },
+              error: new Error(
+                'Timeout ao trocar o código de confirmação.'
+              ),
+            },
+            'Timeout ao trocar o código recebido pelo link de confirmação.'
+          );
+          if (!error && data?.session) {
+            return data.session;
+          }
+          if (error) {
+            console.warn(
+              'Não foi possível trocar o código de confirmação:',
+              error.message
+            );
+          }
+        } catch (error) {
+          console.warn(
+            'Erro ao trocar o código de confirmação:',
+            error?.message
+          );
+        }
+      }
+      if (tokenHash) {
+        const allowedTypes = [
+          'signup',
+          'invite',
+          'recovery',
+          'email_change',
+          'email',
+        ];
+        const verificationType =
+          allowedTypes.includes(type)
+            ? type
+            : 'signup';
+        try {
+          const { data, error } = await withTimeout(
+            supabase.auth.verifyOtp({
+              token_hash: tokenHash,
+              type: verificationType,
+            }),
+            AUTH_BOOT_TIMEOUT_MS,
+            {
+              data: {
+                session: null,
+              },
+              error: new Error(
+                'Timeout ao validar o link de confirmação.'
+              ),
+            },
+            'Timeout ao validar o link recebido por e-mail.'
+          );
+          if (!error && data?.session) {
+            return data.session;
+          }
+          if (error) {
+            console.warn(
+              'Não foi possível validar o link de confirmação:',
+              error.message
+            );
+          }
+        } catch (error) {
+          console.warn(
+            'Erro ao validar o link de confirmação:',
+            error?.message
+          );
+        }
+      }
+      currentSession = await getCurrentSession();
+      return currentSession;
+    };
     const initializeAuth = async () => {
       try {
         if (!hasSupabaseConfig) {
@@ -277,27 +454,10 @@ export const AuthProvider = ({ children }) => {
           }
           return;
         }
-        const { data, error } = await withTimeout(
-          supabase.auth.getSession(),
-          AUTH_BOOT_TIMEOUT_MS,
-          {
-            data: {
-              session: null,
-            },
-            error: new Error(
-              'Timeout ao recuperar a sessão.'
-            ),
-          },
-          'Timeout ao recuperar sessão do Supabase. Liberando a interface para evitar tela infinita de carregamento.'
-        );
-        if (error) {
-          console.error(
-            'Erro ao recuperar sessão:',
-            error.message
-          );
-        }
         const currentSession =
-          data?.session ?? null;
+          cameFromSupabaseAuthCallback
+            ? await restoreSessionFromCallback()
+            : await getCurrentSession();
         if (!isMounted) {
           return;
         }
@@ -308,6 +468,13 @@ export const AuthProvider = ({ children }) => {
             currentSession.user.id,
             currentSession.user
           );
+          if (
+            cameFromSupabaseAuthCallback &&
+            !callbackRedirectHandled
+          ) {
+            callbackRedirectHandled = true;
+            redirectToEditorAfterAuthCallback();
+          }
         } else {
           resetLocalUserState();
         }
@@ -327,7 +494,6 @@ export const AuthProvider = ({ children }) => {
         }
       }
     };
-    initializeAuth();
     const {
       data: listener,
     } = supabase.auth.onAuthStateChange(
@@ -335,15 +501,13 @@ export const AuthProvider = ({ children }) => {
         if (!isMounted) {
           return;
         }
-        sessionRef.current =
-          newSession ?? null;
-        setSession(
-          newSession ?? null
-        );
-        if (newSession?.user) {
+        const nextSession = newSession ?? null;
+        sessionRef.current = nextSession;
+        setSession(nextSession);
+        if (nextSession?.user) {
           const fallbackProfile =
             deriveProfileFromSessionUser(
-              newSession.user
+              nextSession.user
             );
           setDisplayName(
             fallbackProfile.displayName || ''
@@ -355,12 +519,16 @@ export const AuthProvider = ({ children }) => {
             fallbackProfile.email || null
           );
           void fetchUserData(
-            newSession.user.id,
-            newSession.user
+            nextSession.user.id,
+            nextSession.user
           );
+          const canRedirectFromAuthCallback =
+            event === 'SIGNED_IN' ||
+            event === 'INITIAL_SESSION' ||
+            event === 'TOKEN_REFRESHED';
           if (
             cameFromSupabaseAuthCallback &&
-            event === 'SIGNED_IN' &&
+            canRedirectFromAuthCallback &&
             !callbackRedirectHandled
           ) {
             callbackRedirectHandled = true;
@@ -371,6 +539,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
     );
+    void initializeAuth();
     const handleVisibility = () => {
       const currentSession =
         sessionRef.current;
@@ -469,22 +638,15 @@ export const AuthProvider = ({ children }) => {
             privacy_policy_version:
               '2026-06',
           },
-          /*
-           * IMPORTANTE:
-           * Não usar #/editor aqui.
-           * O Supabase precisa usar o fragmento #access_token.
-           */
           emailRedirectTo:
-            typeof window !== 'undefined'
-              ? `${window.location.origin}${window.location.pathname}`
-              : undefined,
+            getEmailRedirectUrl(),
         },
       });
     if (error) {
       throw error;
     }
     alert(
-      'Verifique seu e-mail para confirmar sua conta antes de fazer login.'
+      'Verifique seu e-mail para confirmar sua conta. Após clicar no link, você será direcionado automaticamente para o editor.'
     );
   };
   const signIn = async (

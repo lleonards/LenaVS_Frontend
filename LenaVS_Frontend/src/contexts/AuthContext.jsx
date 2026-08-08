@@ -128,209 +128,104 @@ const EmailConfirmationNotice = ({
 }) => {
   return (
     <div
-      role="presentation"
+      role="status"
+      aria-live="polite"
       style={{
         position: 'fixed',
-        inset: 0,
+        top: '20px',
+        right: '20px',
         zIndex: 9999,
+        width: 'min(360px, calc(100vw - 40px))',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px',
-        background: 'rgba(15, 23, 42, 0.58)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        alignItems: 'flex-start',
+        gap: '12px',
+        padding: '16px',
+        border: '1px solid #e9e3f5',
+        borderRadius: '12px',
+        backgroundColor: '#ffffff',
+        boxShadow: '0 8px 28px rgba(30, 20, 55, 0.12)',
+        color: '#2d2640',
+        fontFamily:
+          'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       }}
     >
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="email-confirmation-title"
-        aria-describedby="email-confirmation-description"
+        aria-hidden="true"
         style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: '460px',
-          overflow: 'hidden',
-          borderRadius: '24px',
-          background: '#ffffff',
-          boxShadow:
-            '0 24px 80px rgba(15, 23, 42, 0.28)',
-          fontFamily:
-            'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          flexShrink: 0,
+          width: '30px',
+          height: '30px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '50%',
+          backgroundColor: '#f3edff',
+          color: '#7651c9',
+          fontSize: '16px',
+          lineHeight: 1,
         }}
       >
-        <div
+        ✓
+      </div>
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+        }}
+      >
+        <strong
           style={{
-            height: '7px',
-            width: '100%',
-            background:
-              'linear-gradient(90deg, #7c3aed 0%, #a855f7 48%, #ec4899 100%)',
-          }}
-        />
-        <div
-          style={{
-            padding: '34px 32px 30px',
-            textAlign: 'center',
+            display: 'block',
+            marginBottom: '4px',
+            fontSize: '14px',
+            fontWeight: 700,
+            lineHeight: 1.35,
           }}
         >
-          <div
+          Confirme seu e-mail
+        </strong>
+        <span
+          style={{
+            display: 'block',
+            color: '#6f687e',
+            fontSize: '13px',
+            lineHeight: 1.5,
+            overflowWrap: 'anywhere',
+          }}
+        >
+          Enviamos um link para{' '}
+          <strong
             style={{
-              width: '72px',
-              height: '72px',
-              margin: '0 auto 22px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '50%',
-              background:
-                'linear-gradient(135deg, #ede9fe 0%, #fce7f3 100%)',
-              color: '#7c3aed',
+              color: '#4f4563',
+              fontWeight: 600,
             }}
           >
-            <svg
-              width="35"
-              height="35"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5h-6.379a2.5 2.5 0 0 0-1.768.732L7.5 18.586V16H6.5A2.5 2.5 0 0 1 4 13.5v-7Z"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="m7.5 8.5 4.5 3 4.5-3"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <h2
-            id="email-confirmation-title"
-            style={{
-              margin: '0 0 12px',
-              color: '#171327',
-              fontSize: '25px',
-              fontWeight: 750,
-              lineHeight: 1.2,
-              letterSpacing: '-0.025em',
-            }}
-          >
-            Confirme seu e-mail
-          </h2>
-          <p
-            id="email-confirmation-description"
-            style={{
-              margin: '0 auto',
-              maxWidth: '360px',
-              color: '#625d72',
-              fontSize: '15px',
-              lineHeight: 1.65,
-            }}
-          >
-            Enviamos um link de confirmação para
-            <strong
-              style={{
-                display: 'block',
-                marginTop: '5px',
-                color: '#332b4d',
-                fontWeight: 700,
-                overflowWrap: 'anywhere',
-              }}
-            >
-              {email || 'seu endereço de e-mail'}
-            </strong>
-          </p>
-          <div
-            style={{
-              display: 'flex',
-              gap: '11px',
-              alignItems: 'flex-start',
-              margin: '24px 0 26px',
-              padding: '14px 16px',
-              borderRadius: '14px',
-              background: '#faf7ff',
-              border: '1px solid #eee7ff',
-              textAlign: 'left',
-            }}
-          >
-            <span
-              aria-hidden="true"
-              style={{
-                flexShrink: 0,
-                marginTop: '1px',
-                color: '#8b5cf6',
-                fontSize: '17px',
-                lineHeight: 1,
-              }}
-            >
-              ✦
-            </span>
-            <span
-              style={{
-                color: '#655b7d',
-                fontSize: '13px',
-                lineHeight: 1.55,
-              }}
-            >
-              Abra o e-mail e clique no link para ativar
-              sua conta. Depois da confirmação, você será
-              direcionado automaticamente para o editor.
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              width: '100%',
-              minHeight: '48px',
-              border: 0,
-              borderRadius: '12px',
-              padding: '12px 18px',
-              background:
-                'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
-              color: '#ffffff',
-              cursor: 'pointer',
-              fontSize: '15px',
-              fontWeight: 700,
-              boxShadow:
-                '0 8px 20px rgba(124, 58, 237, 0.22)',
-              transition:
-                'transform 160ms ease, box-shadow 160ms ease',
-            }}
-            onMouseEnter={(event) => {
-              event.currentTarget.style.transform =
-                'translateY(-1px)';
-              event.currentTarget.style.boxShadow =
-                '0 11px 24px rgba(124, 58, 237, 0.3)';
-            }}
-            onMouseLeave={(event) => {
-              event.currentTarget.style.transform =
-                'translateY(0)';
-              event.currentTarget.style.boxShadow =
-                '0 8px 20px rgba(124, 58, 237, 0.22)';
-            }}
-          >
-            Entendi
-          </button>
-          <p
-            style={{
-              margin: '16px 0 0',
-              color: '#9891a8',
-              fontSize: '12px',
-              lineHeight: 1.5,
-            }}
-          >
-            Não encontrou? Verifique também a pasta de spam.
-          </p>
-        </div>
+            {email || 'seu e-mail'}
+          </strong>
+          . Verifique sua caixa de entrada.
+        </span>
       </div>
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Fechar aviso"
+        style={{
+          flexShrink: 0,
+          width: '24px',
+          height: '24px',
+          margin: '-2px -4px 0 0',
+          padding: 0,
+          border: 0,
+          background: 'transparent',
+          color: '#9a93a8',
+          cursor: 'pointer',
+          fontSize: '20px',
+          fontWeight: 400,
+          lineHeight: 1,
+        }}
+      >
+        ×
+      </button>
     </div>
   );
 };

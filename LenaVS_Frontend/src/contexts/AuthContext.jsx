@@ -849,11 +849,140 @@ export const AuthProvider = ({ children }) => {
           primaryError?.message || ''
         ).toLowerCase();
 
-      const isInvalidCredentials =
-        errorCode.includes(
-          'invalid_credentials'
-        ) ||
-        errorMessage.includes(
-          'invalid login credentials'
-        ) ||
-        error
+     const isInvalidCredentials = (
+      errorCode.includes('invalid_credentials')
+      || errorMessage.includes('invalid login credentials')
+      || errorMessage.includes('invalid credentials')
+    );
+
+    if (isInvalidCredentials) {
+      try {
+        const emailCheck = await api.post('/auth/check-email', {
+          email: normalizedEmail,
+        });
+
+        if (emailCheck.data?.exists === false) {
+          throw new Error(
+            'E-mail não cadastrado. Confira o endereço ou crie uma conta.'
+          );
+        }
+
+        throw new Error(
+          'Senha incorreta. Confira sua senha e tente novamente.'
+        );
+      } catch (checkError) {
+        if (
+          checkError?.message &&
+          /não cadastrado|senha incorreta/i.test(checkError.message)
+        ) {
+          throw checkError;
+        }
+      }
+    }
+
+    if (
+      errorMessage.includes('email not confirmed')
+      || errorCode.includes('email_not_confirmed')
+    ) {
+      throw new Error(
+        'Confirme seu e-mail antes de entrar. Verifique também a pasta de spam.'
+      );
+    }
+
+    throw toFriendlyAuthError(primaryError, 'login');
+  }
+
+  if (data?.session) {
+    setSession(data.session);
+    await fetchUserData(data.session.user.id, data.session.user);
+  }
+
+  return data?.session || null;
+};
+
+const signOut = async () => {
+  try {
+    await supabase.auth.signOut();
+  } catch (err) {
+    console.warn(
+      'Falha ao encerrar sessão Supabase:',
+      err?.message
+    );
+  }
+
+  setSession(null);
+  resetLocalUserState();
+};
+
+const getSafeAuthMessage = (error, operation = 'login') => {
+  const message = String(
+    error?.response?.data?.error
+    || error?.message
+    || ''
+  );
+
+  const knownMessages = [
+    'Digite um e-mail válido.',
+    'A senha precisa ter pelo menos 6 caracteres.',
+    'Este e-mail já está cadastrado. Tente entrar ou use outro e-mail.',
+    'Confirme seu e-mail antes de entrar. Verifique também a pasta de spam.',
+    'E-mail não cadastrado. Confira o endereço ou crie uma conta.',
+    'Senha incorreta. Confira sua senha e tente novamente.',
+    'E-mail não cadastrado ou senha incorreta. Confira os dados e tente novamente.',
+    'Você precisa aceitar os termos de uso e a política de privacidade para criar a conta.',
+    'As senhas não coincidem',
+    'Erro no sistema. Tente novamente mais tarde.',
+  ];
+
+  if (knownMessages.includes(message)) {
+    return message;
+  }
+
+  return 'Erro no sistema. Tente novamente mais tarde.';
+};
+
+const hasUnlimitedAccess = useMemo(() => {
+  const untilDate = parseDateOrNull(unlimitedUntil);
+
+  if (untilDate) {
+    return untilDate.getTime() > Date.now();
+  }
+
+  return plan === 'pro' && subscriptionStatus === 'active';
+}, [plan, subscriptionStatus, unlimitedUntil]);
+
+const creditsLabel = hasUnlimitedAccess
+  ? 'unlimited'
+  : Math.max(0, Number(credits) || 0);
+
+return (
+  <AuthContext.Provider
+    value={{
+      session,
+      user: session?.user ?? null,
+      isAuthenticated: !!session,
+      loading,
+      credits,
+      creditsLabel,
+      plan,
+      subscriptionStatus,
+      unlimitedUntil,
+      hasUnlimitedAccess,
+      cancelScheduledAt,
+      displayName,
+      avatarUrl,
+      userEmail,
+      signUp,
+      signIn,
+      signOut,
+      refreshCredits,
+      updateProfile,
+      getSafeAuthMessage,
+    }}
+  >
+    {children}
+  </AuthContext.Provider>
+);
+};
+
+export const useAuth = () => useContext(AuthContext);

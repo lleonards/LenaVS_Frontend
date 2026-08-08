@@ -715,10 +715,9 @@ export const AuthProvider = ({ children }) => {
               '2026-06',
           },
 
-          emailRedirectTo:
-            typeof window !== 'undefined'
-              ? `${window.location.origin}/#/login?confirmed=1`
-              : undefined,
+          emailRedirectTo: typeof window !== 'undefined'
+  ? ${window.location.origin}/
+  : undefined,
         },
       });
 

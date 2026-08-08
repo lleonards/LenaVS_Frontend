@@ -770,7 +770,7 @@ export const AuthProvider = ({ children }) => {
           true,
 
         message:
-          'Cadastro realizado. Enviamos um link de confirmação para seu e-mail. Confirme a conta antes de fazer login.',
+          'Cadastro realizado. Enviamos um link de confirmação para seu e-mail.',
       };
     } catch (supabaseError) {
       /*
